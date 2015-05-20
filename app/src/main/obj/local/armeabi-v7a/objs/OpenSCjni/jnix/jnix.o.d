@@ -1,6 +1,5 @@
-/home/code/AndroidStudioProjects/Opentee/app/src/main/obj/local/armeabi/objs/OpenSCjni/jniP11/org_opensc_pkcs11_wrap_PKCS11Session.o: \
- /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jniP11/org_opensc_pkcs11_wrap_PKCS11Session.c \
- /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jniP11/org_opensc_pkcs11_wrap_PKCS11Session.h \
+/home/code/AndroidStudioProjects/Opentee/app/src/main/obj/local/armeabi-v7a/objs/OpenSCjni/jnix/jnix.o: \
+ /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jnix/jnix.c \
  /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jnix/jnix.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/jni.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/cdefs.h \
@@ -9,12 +8,7 @@
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/alloca.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/string.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/malloc.h \
- /opt/android-ndk/platforms/android-21/arch-arm/usr/include/xlocale.h \
- /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jniP11/jniP11private.h \
- /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jniP11/opensc/pkcs11.h \
- /opt/android-ndk/platforms/android-21/arch-arm/usr/include/android/log.h
-
-/home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jniP11/org_opensc_pkcs11_wrap_PKCS11Session.h:
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/xlocale.h
 
 /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jnix/jnix.h:
 
@@ -33,9 +27,3 @@
 /opt/android-ndk/platforms/android-21/arch-arm/usr/include/malloc.h:
 
 /opt/android-ndk/platforms/android-21/arch-arm/usr/include/xlocale.h:
-
-/home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jniP11/jniP11private.h:
-
-/home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jniP11/opensc/pkcs11.h:
-
-/opt/android-ndk/platforms/android-21/arch-arm/usr/include/android/log.h:

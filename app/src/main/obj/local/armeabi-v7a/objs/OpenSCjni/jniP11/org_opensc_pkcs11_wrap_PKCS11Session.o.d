@@ -1,4 +1,4 @@
-/home/code/AndroidStudioProjects/Opentee/app/src/main/obj/local/armeabi/objs/OpenSCjni/jniP11/org_opensc_pkcs11_wrap_PKCS11Session.o: \
+/home/code/AndroidStudioProjects/Opentee/app/src/main/obj/local/armeabi-v7a/objs/OpenSCjni/jniP11/org_opensc_pkcs11_wrap_PKCS11Session.o: \
  /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jniP11/org_opensc_pkcs11_wrap_PKCS11Session.c \
  /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jniP11/org_opensc_pkcs11_wrap_PKCS11Session.h \
  /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jnix/jnix.h \

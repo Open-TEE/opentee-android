@@ -25,6 +25,13 @@
 
 #include <jniP11private.h>
 
+#include <android/log.h>
+
+#define  LOG_TAG    "OpenSC_JNI_BINDINGS"
+
+#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+
 /*
  * Class:     org_opensc_pkcs11_wrap_PKCS11Session
  * Method:    openNative
@@ -77,8 +84,8 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
   rv = mod->method->C_CloseSession(hsession);
   if (rv != CKR_OK)
     {
-        //fprintf(stderr,"pkcs11_slot_close_session: C_CloseSession for PKCS11 slot %d(" PKCS11_MOD_NAME_FMT ") failed.",
-          //    (int)slot->id,mod->name);
+      LOGE("pkcs11_slot_close_session: C_CloseSession for PKCS11 slot %d(" PKCS11_MOD_NAME_FMT ") failed.",
+              (int)slot->id,mod->name);
     }
 }
 
@@ -134,8 +141,8 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
   rv = mod->method->C_Logout(hsession);
   if (rv != CKR_OK)
     {
-      //fprintf(stderr,"PKCS11Session.logoutNative: C_Logout for PKCS11 slot %d(" PKCS11_MOD_NAME_FMT ") failed (%s).",
-        //      (int)slot->id,mod->name,pkcs11_strerror(rv));
+      LOGE("PKCS11Session.logoutNative: C_Logout for PKCS11 slot %d(" PKCS11_MOD_NAME_FMT ") failed (%s).",
+              (int)slot->id,mod->name,pkcs11_strerror(rv));
     }
 }
 

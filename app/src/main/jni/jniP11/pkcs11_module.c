@@ -34,7 +34,7 @@
 static int throwWin32Error(JNIEnv *env, const char *msg, const wchar_t *module)
 {
   wchar_t *strerr=0;
-  FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+  FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                  FORMAT_MESSAGE_FROM_SYSTEM,
                  NULL,
                  GetLastError(),
@@ -60,7 +60,7 @@ static CK_RV pkcs11_create_mutex(CK_VOID_PTR_PTR ppMutex)
   if (cs == NULL) return CKR_HOST_MEMORY;
 
   InitializeCriticalSection(cs);
-  
+
   *ppMutex = (CK_VOID_PTR)cs;
 
   return CKR_OK;
@@ -74,7 +74,7 @@ static CK_RV pkcs11_destroy_mutex(CK_VOID_PTR pMutex)
 
   DeleteCriticalSection(cs);
   free(cs);
- 
+
   return CKR_OK;
 }
 
@@ -85,7 +85,7 @@ static CK_RV pkcs11_lock_mutex(CK_VOID_PTR pMutex)
   if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
 
   EnterCriticalSection(cs);
- 
+
   return CKR_OK;
 }
 
@@ -96,7 +96,7 @@ static CK_RV pkcs11_unlock_mutex(CK_VOID_PTR pMutex)
   if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
 
   LeaveCriticalSection(cs);
- 
+
   return CKR_OK;
 }
 #else
@@ -119,7 +119,7 @@ static CK_RV pkcs11_create_mutex(CK_VOID_PTR_PTR ppMutex)
       free(mutex);
       return CKR_GENERAL_ERROR;
     }
-  
+
   *ppMutex = (CK_VOID_PTR)mutex;
 
   return CKR_OK;
@@ -133,7 +133,7 @@ static CK_RV pkcs11_destroy_mutex(CK_VOID_PTR pMutex)
 
   pthread_mutex_destroy(mutex);
   free(mutex);
- 
+
   return CKR_OK;
 }
 
@@ -145,7 +145,7 @@ static CK_RV pkcs11_lock_mutex(CK_VOID_PTR pMutex)
 
   if (pthread_mutex_lock(mutex))
     return CKR_GENERAL_ERROR;
- 
+
   return CKR_OK;
 }
 
@@ -157,7 +157,7 @@ static CK_RV pkcs11_unlock_mutex(CK_VOID_PTR pMutex)
 
   if (pthread_mutex_unlock(mutex))
     return CKR_GENERAL_ERROR;
- 
+
   return CKR_OK;
 }
 
@@ -209,24 +209,24 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
   toCharArrayId = (*env)->GetMethodID(env,sc,"toCharArray","()[C");
 
   if (!toCharArrayId) goto failed;
-  	
+
   ucs2 = (*env)->CallObjectMethod(env,filename,toCharArrayId);
- 
+
   if (!ucs2) goto failed;
- 
+
   sz = (*env)->GetArrayLength(env,ucs2);
   mod->name = (wchar_t *)malloc(2*(sz+1));
 
-  if (!mod->name) 
+  if (!mod->name)
     {
       jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
                          "Out of memory allocating PKCS11 module name.");
       goto failed;
     }
-    
+
   (*env)->GetCharArrayRegion(env,ucs2,0,sz,(jchar*)mod->name);
   mod->name[sz] = 0;
-  
+
   mod->handle = LoadLibraryW(mod->name);
 
   if (!mod->handle)
@@ -235,40 +235,40 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
       goto failed;
     }
 #else
-  if (lt_dlinit() != 0)
-    {
-      jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
-                         "Unable ot initialize dynamic function loading.");
-      return 0;
-    }
+  //if (lt_dlinit() != 0)
+    //{
+    //  jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
+    //                     "Unable ot initialize dynamic function loading.");
+    //  return 0;
+    //}
 
   getBytesId = (*env)->GetMethodID(env,sc,"getBytes","()[B");
 
   if (!getBytesId) goto failed;
-  	
+
   filename8 = (*env)->CallObjectMethod(env,filename,getBytesId);
- 
+
   if (!filename8) goto failed;
 
   sz = (*env)->GetArrayLength(env,filename8);
   mod->name = (char*)malloc(sz+1);
 
-  if (!mod->name) 
+  if (!mod->name)
     {
       jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
                          "Out of memory allocating PKCS11 module name.");
       goto failed;
     }
-    
+
   (*env)->GetByteArrayRegion(env,filename8,0,sz,(jbyte*)mod->name);
   mod->name[sz] = 0;
 
-  mod->handle = lt_dlopen(mod->name);
+  mod->handle = dlopen(mod->name, RTLD_NOW);
 
   if (mod->handle == NULL)
     {
       jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
-                         "Cannot open PKCS11 module %s: %s.",mod->name,lt_dlerror());
+                         "Cannot open PKCS11 module %s: %s.",mod->name,dlerror());
       goto failed;
     }
 #endif
@@ -282,16 +282,16 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
     	throwWin32Error(env,"Cannot find function C_GetFunctionList in PKCS11 module",mod->name);
       goto failed;
     }
-      
+
 #else
   c_get_function_list = (CK_RV (*)(CK_FUNCTION_LIST_PTR_PTR))
-    lt_dlsym(mod->handle, "C_GetFunctionList");
-    
+    dlsym(mod->handle, "C_GetFunctionList");
+
   if (!c_get_function_list)
     {
       jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
                          "Cannot find function C_GetFunctionList in PKCS11 module %s: %s.",
-                         mod->name,lt_dlerror());
+                         mod->name,dlerror());
       goto failed;
     }
 #endif
@@ -313,7 +313,7 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
                           mod->name);
       goto failed;
     }
-  
+
   /* Get info on the library */
   rv = mod->method->C_GetInfo(&mod->ck_info);
   if (rv != CKR_OK)
@@ -337,18 +337,18 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
 
 failed:
   if (mod->name) free(mod->name);
- 
+
 #ifdef WIN32
   if (mod->handle)
     FreeLibrary(mod->handle);
 #else
   if (mod->handle)
-    lt_dlclose(mod->handle);
+    dlclose(mod->handle);
 #endif
   free(mod);
 
 #ifndef WIN32
-  lt_dlexit();
+  //lt_dlexit();
 #endif
   return 0;
 }
@@ -368,13 +368,13 @@ pkcs11_module_t *pkcs11_module_from_jhandle(JNIEnv *env, jlong handle)
                          "Invalid PKCS 11 module handle %p.",(void*)mod);
       return 0;
     }
-  
+
   return mod;
 }
 
 void destroy_pkcs11_module(JNIEnv *env, pkcs11_module_t *mod)
 {
- 
+
 #ifdef DEBUG_PKCS11_MODULE
   fprintf(stderr,"Unloading module: " PKCS11_MOD_NAME_FMT ".\n",mod->name);
   fprintf(stderr,"handle= %p.\n",mod);
@@ -388,7 +388,7 @@ void destroy_pkcs11_module(JNIEnv *env, pkcs11_module_t *mod)
     FreeLibrary(mod->handle);
 #else
   if (mod->handle)
-    lt_dlclose(mod->handle);
+    dlclose(mod->handle);
 #endif
 
   if (mod->name) free(mod->name);
@@ -397,6 +397,6 @@ void destroy_pkcs11_module(JNIEnv *env, pkcs11_module_t *mod)
   free(mod);
 
 #ifndef WIN32
-  lt_dlexit();
+  //lt_dlexit();
 #endif
 }
