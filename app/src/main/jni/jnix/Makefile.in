@@ -1,0 +1,88 @@
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+
+# Where does the installation go ?
+PREFIX=@prefix@
+DESTDIR=@DESTDIR@
+LIBSUBDIR=@LIBSUBDIR@
+BINDIR=$(DESTDIR)$(PREFIX)/bin
+LIBDIR=$(DESTDIR)$(PREFIX)/$(LIBSUBDIR)
+INCLUDEDIR=$(DESTDIR)$(PREFIX)/include
+
+# filename conventions
+EXE=@EXEEXT@
+OBJ=@OBJEXT@
+
+# compilers used.
+LIBPFX=@LIBPFX@
+LIBEXT=@LIBEXT@
+
+CC   = @CC@
+CXX  = @CXX@
+LD   = @CXX@
+AR   = @AR@
+ARFLAGS   = @ARFLAGS@
+
+# add -I.. in order to find config.h
+CFLAGS = \
+	@CFLAGS@  @DEFS@ @JNI_CFLAGS@ @DYN_CFLAGS@ -I.. -I$(srcdir)
+
+CXXFLAGS = \
+	@CXXFLAGS@  @DEFS@ @JNI_CFLAGS@ @DYN_CFLAGS@ -I.. -I$(srcdir)
+
+%.depend:  $(srcdir)/%.c
+	$(CC) $(CFLAGS) -M $< -o $@
+
+%.depend:  $(srcdir)/%.cpp
+	$(CXX) $(CXXFLAGS) -M $< -o $@
+
+%.depend: %.cc
+	$(CXX) $(CXXFLAGS) -M $< -o $@
+
+%.$(OBJ): $(srcdir)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.$(OBJ): $(srcdir)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+%.$(OBJ): %.cc
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+#
+# objects
+#
+JNIOBJECTS =	jnix.$(OBJ)
+
+ALLOBJECTS=$(JNIOBJECTS)
+
+LIBRARY = $(LIBPFX)jnix.$(LIBEXT)
+
+all: Makefile build-dep
+
+Makefile: $(srcdir)/Makefile.in
+	echo "Updating out-of-date Makefiles..."
+	../reconfigure.sh
+
+build-dep:
+	$(MAKE) dep=yes build
+
+build: $(LIBRARY)
+
+clean::
+	rm -f *.depend *.$(OBJ) *~ *.bak .*~ .*.bak core $(LIBRARY)
+
+distclean:: clean
+	rm -f Makefile
+
+$(LIBRARY):  $(JNIOBJECTS)
+	rm -f $@
+	$(AR) $(ARFLAGS) $@ $(JNIOBJECTS)
+
+install: all
+
+#
+# dependencies
+#
+ifeq ($(dep),yes)
+include $(addsuffix .depend, $(basename $(ALLOBJECTS)))
+endif
