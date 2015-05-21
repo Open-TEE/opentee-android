@@ -1,0 +1,120 @@
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+
+# The API version.
+# This value has to correspond to the value of version in build.xml
+VERSION=0.3
+
+# Where does the installation go ?
+PREFIX=@prefix@
+DESTDIR=@DESTDIR@
+LIBSUBDIR=@LIBSUBDIR@
+BINDIR=$(DESTDIR)$(PREFIX)/bin
+LIBDIR=$(DESTDIR)$(PREFIX)/$(LIBSUBDIR)
+INCLUDEDIR=$(DESTDIR)$(PREFIX)/include
+
+# filename conventions
+EXE=@EXEEXT@
+OBJ=@OBJEXT@
+
+# compilers used.
+LIBDYNPFX=@LIBDYNPFX@
+LIBDYN=@LIBDYN@
+
+LIBPFX=@LIBPFX@
+LIBEXT=@LIBEXT@
+
+CC   = @CC@
+CXX  = @CXX@
+LD   = @CC@
+STRIP = @STRIP@
+
+# add -I.. in order to find config.h
+CFLAGS = \
+	@CFLAGS@  @DEFS@ @PKCS11_CFLAGS@ @JNI_CFLAGS@ @DYN_CFLAGS@ -I.. -I$(srcdir) -I$(top_srcdir)/jnix
+
+CXXFLAGS = \
+	@CXXFLAGS@  @DEFS@ @PKCS11_CFLAGS@ @JNI_CFLAGS@ @DYN_CFLAGS@ -I.. -I$(srcdir) -I$(top_srcdir)/jnix
+
+LDFLAGS = @LDFLAGS@ @PKCS11_LDFLAGS@ @JNI_LDFLAGS@ @DYN_LDFLAGS@
+
+LIBS=@PKCS11_LIBS@ @JNI_LIBS@ @LIBS@
+
+#libraries, which are in the same source tree.
+BASELIBRARIES=../jnix/$(LIBPFX)jnix.$(LIBEXT)
+
+%.depend:  $(srcdir)/%.c
+	$(CC) $(CFLAGS) -M $< -o $@
+
+%.depend:  $(srcdir)/%.cpp
+	$(CXX) $(CXXFLAGS) -M $< -o $@
+
+%.depend: %.cc
+	$(CXX) $(CXXFLAGS) -M $< -o $@
+
+%.$(OBJ): $(srcdir)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.$(OBJ): $(srcdir)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+%.$(OBJ): %.cc
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+#
+# objects
+#
+JNIOBJECTS =	org_opensc_pkcs11_PKCS11Provider.$(OBJ) \
+		org_opensc_pkcs11_wrap_PKCS11Slot.$(OBJ) \
+		org_opensc_pkcs11_wrap_PKCS11Session.$(OBJ) \
+		org_opensc_pkcs11_wrap_PKCS11Object.$(OBJ) \
+		org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.$(OBJ) \
+		org_opensc_pkcs11_spi_PKCS11SignatureSpi.$(OBJ) \
+		org_opensc_pkcs11_spi_PKCS11CipherSpi.$(OBJ) \
+		pkcs11_module.$(OBJ) \
+		pkcs11_slot.$(OBJ) \
+		pkcs11_error.$(OBJ)
+
+ALLOBJECTS=$(JNIOBJECTS)
+
+LIBRARY = $(LIBDYNPFX)opensc-PKCS11-$(VERSION).$(LIBDYN)
+
+all: Makefile build-dep
+
+Makefile: $(srcdir)/Makefile.in
+	echo "Updating out-of-date Makefiles..."
+	../reconfigure.sh
+
+build-dep:
+	$(MAKE) dep=yes build
+
+build: $(LIBRARY)
+
+clean::
+	rm -f *.depend *.$(OBJ) *~ *.bak .*~ .*.bak core $(LIBRARY)
+
+distclean:: clean
+	rm -f Makefile
+
+
+foo:
+
+../jnix/$(LIBPFX)jnix.$(LIBEXT): foo
+	$(MAKE) -C ../jnix $(LIBPFX)jnix.$(LIBEXT)
+
+$(LIBRARY): $(BASELIBRARIES) $(JNIOBJECTS)
+	rm -f $@
+	$(LD) $(LDFLAGS) $(JNIOBJECTS) $(BASELIBRARIES) $(LIBS) -o $@
+
+install: all
+	mkdir -p $(LIBDIR)
+	cp $(LIBRARY) $(LIBDIR)
+	chmod 775 $(LIBDIR)/$(LIBRARY)
+	strip $(LIBDIR)/$(LIBRARY)
+
+#
+# dependencies
+#
+ifeq ($(dep),yes)
+include $(addsuffix .depend, $(basename $(ALLOBJECTS)))
+endif

@@ -25,8 +25,8 @@
 
 package org.opensc.pkcs11.spi;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import android.util.Log;
+
 import org.opensc.pkcs11.PKCS11LoadStoreParameter;
 import org.opensc.pkcs11.PKCS11Provider;
 import org.opensc.pkcs11.PKCS11SessionStore;
@@ -72,7 +72,7 @@ import javax.security.auth.x500.X500Principal;
  */
 public class PKCS11KeyStoreSpi extends KeyStoreSpi
 {
-	static private final Log log = LogFactory.getLog(PKCS11KeyStoreSpi.class);
+	private static final String TAG = "PKCS11KeyStoreSpi";
 
 	static private final int MAX_SIMILAR_CERTIFICATES = 32;
 	
@@ -192,7 +192,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 		
 		if (!(endEntity instanceof X509Certificate))
 		{
-			log.error("engineGetCertificateChain: Only X.509 certificates are supported.");
+			Log.e(TAG, "engineGetCertificateChain: Only X.509 certificates are supported.");
 			return null;
 		}
 		
@@ -232,7 +232,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 						break;
 					}
 					catch (Exception e) {
-						log.warn("Exception during evaluation of certificate chain:",e);
+						Log.w(TAG, "Exception during evaluation of certificate chain:" + e);
 					}
 				}
 				
@@ -249,7 +249,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 			
 		} catch (Exception e)
 		{
-			log.error("Exception caught during analysis of the certificate chain:",e);
+			Log.w(TAG, "Exception caught during analysis of the certificate chain:" + e);
 		}
 		return null;
 	}
@@ -267,10 +267,10 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 			return entry.getDecodedCertificate();
 		} catch (PKCS11Exception e)
 		{
-			log.error("PKCS11 Error decoding Certificate for entry "+name+":",e);
+			Log.e(TAG, "PKCS11 Error decoding Certificate for entry " + name + ":" + e);
 		} catch (CertificateException e)
 		{
-			log.error("Certificate Error decoding Certificate for entry "+name+":",e);
+			Log.e(TAG, "Certificate Error decoding Certificate for entry " + name + ":" + e);
 		}
 		return null;
 	}
@@ -420,7 +420,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	{
 		if (! (certificate instanceof X509Certificate))
 		{
-			log.error("engineGetCertificateAlias: Only X.509 certificates are supported.");
+			Log.e(TAG, "engineGetCertificateAlias: Only X.509 certificates are supported.");
 		}
 		
 		X509Certificate x509Certificate = (X509Certificate)certificate;
@@ -441,10 +441,10 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 				
 			} catch (PKCS11Exception e)
 			{
-				log.error("PKCS11 Error decoding Certificate for entry "+name+":",e);
+				Log.e(TAG, "PKCS11 Error decoding Certificate for entry " + name + ":" + e);
 			} catch (CertificateException e)
 			{
-				log.error("Certificate Error decoding Certificate for entry "+name+":",e);
+				Log.e(TAG, "Certificate Error decoding Certificate for entry " + name + ":" + e);
 			}
 		}
 		

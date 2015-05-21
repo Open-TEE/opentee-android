@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Opentee.iml" filepath="$PROJECT_DIR$/Opentee.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/openteelib/openteelib.iml" filepath="$PROJECT_DIR$/openteelib/openteelib.iml" />
     </modules>
   </component>
 </project>

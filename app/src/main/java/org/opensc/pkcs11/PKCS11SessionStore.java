@@ -25,6 +25,8 @@
 
 package org.opensc.pkcs11;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStore.CallbackHandlerProtection;
@@ -39,8 +41,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opensc.pkcs11.wrap.PKCS11Exception;
 import org.opensc.pkcs11.wrap.PKCS11Session;
 import org.opensc.pkcs11.wrap.PKCS11Slot;
@@ -55,7 +55,7 @@ import org.opensc.pkcs11.wrap.PKCS11Slot;
  */
 public class PKCS11SessionStore implements LoadStoreParameter
 {
-    private static Log log = LogFactory.getLog(PKCS11SessionStore.class);
+    private static final String TAG = "PKCS11SessionStore";
     
     PKCS11Slot slot;
     PKCS11Session session;
@@ -84,7 +84,7 @@ public class PKCS11SessionStore implements LoadStoreParameter
             this.eventHandler.handle(new Callback[]{this.cb});
         } catch (UnsupportedCallbackException e)
         {
-            log.warn("PKCSEventCallback not supported by CallbackHandler ["+this.eventHandler.getClass()+"]",e);
+            Log.e(TAG, "PKCSEventCallback not supported by CallbackHandler [" + this.eventHandler.getClass() + "]" + e);
         }
     }
     
@@ -314,7 +314,7 @@ public class PKCS11SessionStore implements LoadStoreParameter
                 this.slot.destroy();
             } catch (DestroyFailedException e)
             {
-                log.warn("Cannot destroy slot:",e);
+                Log.w(TAG, "Cannot destroy slot:" + e);
             }
         }        
         

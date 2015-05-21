@@ -1,0 +1,8 @@
+# Public header files
+
+include_HEADERS += \
+	include/com_protocol.h \
+	include/tee_client_api.h \
+	include/tee_logging.h \
+	include/tee_shared_data_types.h
+
