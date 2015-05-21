@@ -1,0 +1,3 @@
+set solib-search-path /home/code/AndroidStudioProjects/Opentee/app/src/main/obj/local/armeabi-v7a
+source /opt/android-ndk/prebuilt/common/gdb/common.setup
+directory /opt/android-ndk/platforms/android-21/arch-arm/usr/include /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/ /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/opensc /opt/android-ndk/sources/cxx-stl/gnu-libstdc++

@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 apply plugin: 'com.android.application'
 
 android {
@@ -26,22 +28,7 @@ android {
         jniLibs.srcDir 'src/main/libs' // This is not necessary unless you have precompiled libraries in your project.
     }
     task buildNative(type: Exec, description: 'Compile JNI source via NDK') {
-        File ndkDir = project.getPlugins().getPlugin('android').sdkHandler.ndkFolder
-        if (ndkDir == null) {
-            ndkDir = file(System.env.ANDROID_NDK)
-        }
-
-        if (ndkDir == null) {
-            def gradle_project_root = project.rootProject.rootDir
-            throw new GradleException("NDK is not configured. Make sure there is a local.properties " +
-                    "file with an ndk.dir entry in the directory ${gradle_project_root}, or set the " +
-                    "ANDROID_NDK envrionment variable")
-        }
-
-        def ndkBuildExecutable = new File(ndkDir, 'ndk-build')
-        if (!ndkBuildExecutable.exists()) {
-            throw new GradleException("Could not find ndk-build. The configured NDK directory ${ndkDir} may not be correct.")
-        }
+        def ndkBuildExecutable = getNdkDir()
         commandLine "$ndkBuildExecutable",
                 '-C', file('src/main/jni').absolutePath, // Change src/main/jni the relative path to your jni source
                 '-j', Runtime.runtime.availableProcessors(),
@@ -50,22 +37,7 @@ android {
     }
 
     task cleanNative(type: Exec, description: 'Clean JNI object files') {
-        File ndkDir = project.getPlugins().getPlugin('android').sdkHandler.ndkFolder
-        if (ndkDir == null) {
-            ndkDir = file(System.env.ANDROID_NDK)
-        }
-
-        if (ndkDir == null) {
-            def gradle_project_root = project.rootProject.rootDir
-            throw new GradleException("NDK is not configured. Make sure there is a local.properties " +
-                    "file with an ndk.dir entry in the directory ${gradle_project_root}, or set the " +
-                    "ANDROID_NDK envrionment variable")
-        }
-
-        def ndkBuildExecutable = new File(ndkDir, 'ndk-build')
-        if (!ndkBuildExecutable.exists()) {
-            throw new GradleException("Could not find ndk-build. The configured NDK directory ${ndkDir} may not be correct.")
-        }
+        def ndkBuildExecutable = getNdkDir()
         commandLine "$ndkBuildExecutable",
                 '-C', file('src/main/jni').absolutePath, // Change src/main/jni the relative path to your jni source
                 'clean'
@@ -96,6 +68,34 @@ android {
     }
 
 }
+
+def getNdkDir() {
+    File ndkDir = project.getPlugins().getPlugin('android').sdkHandler.ndkFolder
+    if (ndkDir == null) {
+        ndkDir = file(System.env.ANDROID_NDK)
+    }
+
+    if (ndkDir == null) {
+        def gradle_project_root = project.rootProject.rootDir
+        throw new GradleException("NDK is not configured. Make sure there is a local.properties " +
+                "file with an ndk.dir entry in the directory ${gradle_project_root}, or set the " +
+                "ANDROID_NDK envrionment variable")
+    }
+
+    def ndkBuildExecutable
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        ndkBuildExecutable = new File(ndkDir, 'ndk-build.cmd')
+    } else {
+        ndkBuildExecutable = new File(ndkDir, 'ndk-build')
+    }
+
+    if (!ndkBuildExecutable.exists()) {
+        throw new GradleException("Could not find ndk-build executable." +
+                " The configured NDK directory ${ndkDir} may not be correct.")
+    }
+    return ndkBuildExecutable
+}
+
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
