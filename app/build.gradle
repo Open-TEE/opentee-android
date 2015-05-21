@@ -33,6 +33,7 @@ android {
                 '-C', file('src/main/jni').absolutePath, // Change src/main/jni the relative path to your jni source
                 '-j', Runtime.runtime.availableProcessors(),
                 'all',
+                'NDK_APPLICATION_MK=', file('src/main/jni').absolutePath, 'Application.mk',
                 'NDK_DEBUG=1'
     }
 
@@ -40,6 +41,7 @@ android {
         def ndkBuildExecutable = getNdkDir()
         commandLine "$ndkBuildExecutable",
                 '-C', file('src/main/jni').absolutePath, // Change src/main/jni the relative path to your jni source
+                'NDK_APPLICATION_MK=', file('src/main/jni').absolutePath, 'Application.mk',
                 'clean'
     }
 

@@ -1,7 +1,6 @@
 /home/code/AndroidStudioProjects/Opentee/app/src/main/obj/local/armeabi/objs-debug/OpenSCjni/org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.o: \
- /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.c \
- /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.h \
- /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jnix.h \
+ org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.c \
+ org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.h jnix.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/jni.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/cdefs.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/cdefs_elf.h \
@@ -10,8 +9,7 @@
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/string.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/malloc.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/xlocale.h \
- /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jniP11private.h \
- /home/code/AndroidStudioProjects/Opentee/app/src/main/jni/opensc/pkcs11.h \
+ jniP11private.h opensc/pkcs11.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/stdlib.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/strings.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/types.h \
@@ -31,9 +29,9 @@
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/sysmacros.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/memory.h
 
-/home/code/AndroidStudioProjects/Opentee/app/src/main/jni/org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.h:
+org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.h:
 
-/home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jnix.h:
+jnix.h:
 
 /opt/android-ndk/platforms/android-21/arch-arm/usr/include/jni.h:
 
@@ -51,9 +49,9 @@
 
 /opt/android-ndk/platforms/android-21/arch-arm/usr/include/xlocale.h:
 
-/home/code/AndroidStudioProjects/Opentee/app/src/main/jni/jniP11private.h:
+jniP11private.h:
 
-/home/code/AndroidStudioProjects/Opentee/app/src/main/jni/opensc/pkcs11.h:
+opensc/pkcs11.h:
 
 /opt/android-ndk/platforms/android-21/arch-arm/usr/include/stdlib.h:
 
