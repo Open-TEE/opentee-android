@@ -32,7 +32,7 @@ android {
         commandLine "$ndkBuildExecutable",
                 '-C', file('src/main/jni').absolutePath, // Change src/main/jni the relative path to your jni source
                 '-j', Runtime.runtime.availableProcessors(),
-                'NDK_APPLICATION_MK=', file('src/main/jni').absolutePath, 'Application.mk',
+                'NDK_APPLICATION_MK=' + file('src/main/jni').absolutePath + File.separator + 'Application.mk',
                 'V=1',
                 'NDK_DEBUG=1'
     }

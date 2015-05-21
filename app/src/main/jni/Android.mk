@@ -6,7 +6,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libtee_prebuilt
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/prebuilt_libs/libtee_include
 LOCAL_SRC_FILES := $(LOCAL_PATH)/prebuilt_libs/$(TARGET_ARCH_ABI)/libtee.so
-$(warning $(LOCAL_SRC_FILES))
+$(info $(LOCAL_SRC_FILES))
 #ifeq ($(TARGET_ARCH),arm)
 #LOCAL_SRC_FILE := prebuilt_libs/armeabi/libtee_pkcs11.so
 #endif
