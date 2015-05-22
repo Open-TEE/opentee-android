@@ -67,6 +67,9 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	private static final double patchlevel = 0;
 
 	static {
+		// Note: The order in which the libraries are called here is important!
+		// First you load libtee, then libtee_pkcs11 which is dependent on libtee
+		// and last libOpenSCjni which depends on libtee_pkcs11
 		System.loadLibrary("tee");
 		System.loadLibrary("tee_pkcs11");
 		System.loadLibrary("OpenSCjni");
