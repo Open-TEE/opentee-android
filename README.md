@@ -1,5 +1,4 @@
-OpenSC-android
-==============
+#OpenSC-android
 
 This is the android port of the OpenSC jni bindings.
 
