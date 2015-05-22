@@ -8,6 +8,12 @@ import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
+    static {
+        System.loadLibrary("tee");
+        System.loadLibrary("tee_pkcs11");
+        System.loadLibrary("OpenSCjni");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
