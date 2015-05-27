@@ -25,11 +25,11 @@
 
 package org.opensc.pkcs11.wrap;
 
+import org.opensc.util.PKCS11Id;
+
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.opensc.util.PKCS11Id;
 
 /**
  * @author wglas
@@ -54,7 +54,7 @@ public class PKCS11PublicKey extends PKCS11Key implements PublicKey
 			throws PKCS11Exception
 	{
 		super(session, type, handle);
-		this.encoded = getRawAttribute(PKCS11Attribute.CKA_VALUE);
+		//this.encoded = getRawAttribute(PKCS11Attribute.CKA_VALUE);
 	}
 	
     private static PKCS11PublicKey makePublicKey(PKCS11Session session, long handle, int keyType) throws PKCS11Exception

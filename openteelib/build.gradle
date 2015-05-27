@@ -3,12 +3,12 @@ import org.apache.tools.ant.taskdefs.condition.Os
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 22
+    compileSdkVersion 21
     buildToolsVersion "22.0.1"
 
     defaultConfig {
         //applicationId "fi.aalto.opentee"
-        minSdkVersion 22
+        minSdkVersion 21
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"

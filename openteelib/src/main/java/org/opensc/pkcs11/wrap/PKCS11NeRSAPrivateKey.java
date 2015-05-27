@@ -51,8 +51,8 @@ public class PKCS11NeRSAPrivateKey extends PKCS11PrivateKey implements RSAKey
 	{
 		super(session, CKK_RSA, false, handle);
 		
-		byte [] raw_modulus = getRawAttribute(PKCS11Attribute.CKA_MODULUS);
-		this.modulus = new BigInteger(raw_modulus);
+		//byte [] raw_modulus = getRawAttribute(PKCS11Attribute.CKA_MODULUS);
+		//this.modulus = new BigInteger(raw_modulus);
 	}
 
 	/* (non-Javadoc)

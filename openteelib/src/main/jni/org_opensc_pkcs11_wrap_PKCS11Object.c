@@ -25,7 +25,7 @@
 #include <jniP11private.h>
 #include <stdlib.h>
 
-#define ENUM_HANDLES_BLOCK_SZ 32
+#define ENUM_HANDLES_BLOCK_SZ 10
 
 /*
  * Class:     org_opensc_pkcs11_wrap_PKCS11Object
@@ -79,6 +79,10 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
       data = (jbyteArray)(*env)->CallObjectMethod(env,jattr,getDataID);
 
       allocaCArrayFromJByteArray(pAttributes[i].pValue,pAttributes[i].ulValueLen,env,data);
+
+      // TODO HACK
+      pAttributes[i].ulValueLen = 8;
+      // TODO CHECK allocaCArrayFrom....
     }
 
   ret_obj_ids_sz = ENUM_HANDLES_BLOCK_SZ;
@@ -93,7 +97,7 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
       goto failed;
     }
 
-  rv = mod->method->C_FindObjectsInit(hsession,pAttributes,ulAttributeCount);
+  rv = mod->method->C_FindObjectsInit(hsession,pAttributes,1);
 
   if (rv  != CKR_OK)
     {

@@ -25,13 +25,13 @@
 
 package org.opensc.pkcs11.wrap;
 
-import java.io.UnsupportedEncodingException;
-
-import javax.security.auth.DestroyFailedException;
-
 import org.opensc.pkcs11.PKCS11Provider;
 import org.opensc.util.DestroyableChild;
 import org.opensc.util.PKCS11Id;
+
+import java.io.UnsupportedEncodingException;
+
+import javax.security.auth.DestroyFailedException;
 
 /**
  * @author wglas
@@ -187,9 +187,9 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
      */
     protected static long findRawObject(PKCS11Session session, int pkcs11_cls, PKCS11Id id) throws PKCS11Exception
     {
-        PKCS11Attribute attrs[] = new PKCS11Attribute[2];
+        PKCS11Attribute attrs[] = new PKCS11Attribute[1];
         attrs[0] = new PKCS11Attribute(PKCS11Attribute.CKA_CLASS,pkcs11_cls);
-        attrs[1] = new PKCS11Attribute(PKCS11Attribute.CKA_ID,id);
+        //attrs[1] = new PKCS11Attribute(PKCS11Attribute.CKA_ID,id);
         
         long[] handles = enumObjectsNative(session.getPvh(),session.getSlotHandle(),session.getHandle(),
                                            attrs);

@@ -25,11 +25,11 @@
 
 package org.opensc.pkcs11.wrap;
 
+import org.opensc.util.PKCS11Id;
+
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.opensc.util.PKCS11Id;
 
 /**
  * @author wglas
@@ -57,7 +57,7 @@ public class PKCS11PrivateKey extends PKCS11Key implements PrivateKey
 		super(session,type,handle);
 		
 		this.extractable = extractable;		
-		this.sensitive = super.getBooleanAttribute(PKCS11Attribute.CKA_SENSITIVE);
+		//this.sensitive = super.getBooleanAttribute(PKCS11Attribute.CKA_SENSITIVE);
 	}
 
     private static PKCS11PrivateKey makePrivateKey(PKCS11Session session, long handle, int keyType, boolean extractable) throws PKCS11Exception
@@ -142,8 +142,8 @@ public class PKCS11PrivateKey extends PKCS11Key implements PrivateKey
         
         int keyType = PKCS11Object.getULongAttribute(session,handle,PKCS11Attribute.CKA_KEY_TYPE);
         
-        boolean extractable=
-            PKCS11Object.getBooleanAttribute(session,handle,PKCS11Attribute.CKA_EXTRACTABLE);
+        boolean extractable = false;
+           // PKCS11Object.getBooleanAttribute(session,handle,PKCS11Attribute.CKA_EXTRACTABLE);
 
         return makePrivateKey(session,handle,keyType,extractable);
     }
