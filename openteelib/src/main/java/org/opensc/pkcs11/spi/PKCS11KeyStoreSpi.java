@@ -26,23 +26,11 @@
 package org.opensc.pkcs11.spi;
 
 import android.util.Log;
-
-import org.opensc.pkcs11.PKCS11LoadStoreParameter;
-import org.opensc.pkcs11.PKCS11Provider;
-import org.opensc.pkcs11.PKCS11SessionStore;
-import org.opensc.pkcs11.wrap.PKCS11Certificate;
-import org.opensc.pkcs11.wrap.PKCS11Exception;
-import org.opensc.pkcs11.wrap.PKCS11PrivateKey;
-import org.opensc.util.PKCS11Id;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.KeyStore.Entry;
-import java.security.KeyStore.LoadStoreParameter;
-import java.security.KeyStore.PasswordProtection;
 import java.security.KeyStoreException;
 import java.security.KeyStoreSpi;
 import java.security.NoSuchAlgorithmException;
@@ -50,6 +38,9 @@ import java.security.NoSuchProviderException;
 import java.security.ProviderException;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
+import java.security.KeyStore.Entry;
+import java.security.KeyStore.LoadStoreParameter;
+import java.security.KeyStore.PasswordProtection;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -64,6 +55,14 @@ import java.util.Set;
 import java.util.Vector;
 
 import javax.security.auth.x500.X500Principal;
+
+import org.opensc.pkcs11.PKCS11LoadStoreParameter;
+import org.opensc.pkcs11.PKCS11Provider;
+import org.opensc.pkcs11.PKCS11SessionStore;
+import org.opensc.pkcs11.wrap.PKCS11Certificate;
+import org.opensc.pkcs11.wrap.PKCS11Exception;
+import org.opensc.pkcs11.wrap.PKCS11PrivateKey;
+import org.opensc.util.PKCS11Id;
 
 /**
  * This is a JAVA KeyStore, which accesses a slot on a PKCS#11 cryptographic token.

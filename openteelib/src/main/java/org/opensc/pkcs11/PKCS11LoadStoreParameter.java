@@ -12,7 +12,7 @@ import javax.security.auth.callback.CallbackHandler;
  * in order to configure PKCS11 store loading with parameters appropriate
  * for cyrptographic tokens.
  * 
- * @see java.security.KeyStore#load(LoadStoreParameter)
+ * @see java.security.KeyStore#load(java.security.KeyStore.LoadStoreParameter)
  * @author wglas
  */
 public class PKCS11LoadStoreParameter implements LoadStoreParameter
@@ -55,8 +55,8 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	 *                            is needed for signing as well as for listing 
 	 *                            private keys on the token.
 	 *                            
-	 * @see PasswordProtection
-	 * @see CallbackHandlerProtection
+	 * @see java.security.KeyStore.PasswordProtection
+	 * @see java.security.KeyStore.CallbackHandlerProtection
 	 * @see javax.security.auth.callback.PasswordCallback
 	 */
 	public void setProtectionParameter(ProtectionParameter protectionParameter)
@@ -93,7 +93,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	 * 
 	 * @see PKCS11LoadStoreParameter#setProtectionParameter(ProtectionParameter)
 	 * @see javax.security.auth.callback.PasswordCallback
-	 * @see CallbackHandlerProtection
+	 * @see java.security.KeyStore.CallbackHandlerProtection
 	 */
 	public void setProtectionCallback(CallbackHandler handler)
 	{
@@ -115,8 +115,8 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	 *                            be used. A SO protection parameter is used,
 	 *                            when the token is opened in read/write mode.
 	 *                            
-	 * @see PasswordProtection
-	 * @see CallbackHandlerProtection
+	 * @see java.security.KeyStore.PasswordProtection
+	 * @see java.security.KeyStore.CallbackHandlerProtection
 	 * @see javax.security.auth.callback.PasswordCallback
 	 */
 	public void setSOProtectionParameter(ProtectionParameter protectionParameter)
@@ -153,7 +153,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	 * 
 	 * @see PKCS11LoadStoreParameter#setSOProtectionParameter(ProtectionParameter)
 	 * @see javax.security.auth.callback.PasswordCallback
-	 * @see CallbackHandlerProtection
+	 * @see java.security.KeyStore.CallbackHandlerProtection
 	 */
 	public void setSOProtectionCallback(CallbackHandler handler)
 	{

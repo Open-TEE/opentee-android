@@ -27,6 +27,14 @@
 
 #define ENUM_HANDLES_BLOCK_SZ 10
 
+typedef struct myAttribute {
+  CK_ATTRIBUTE_TYPE type;
+  CK_VOID_PTR       pValue;
+
+  /* ulValueLen went from CK_USHORT to CK_ULONG for v2.0 */
+  CK_ULONG          ulValueLen;  /* in bytes */
+} myAttribute;
+
 /*
  * Class:     org_opensc_pkcs11_wrap_PKCS11Object
  * Method:    enumObjectsNative
@@ -47,6 +55,9 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
   jlongArray ret;
   pkcs11_slot_t *slot;
 
+#ifndef ANDROID
+  fprintf(stderr, "----------::Session ID: Login %lu\n", hsession);
+#endif
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
@@ -68,6 +79,13 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
   ulAttributeCount = (*env)->GetArrayLength(env,attrs);
   pAttributes = alloca(ulAttributeCount * sizeof(CK_ATTRIBUTE));
 
+  CK_OBJECT_CLASS obj_class = CKO_PUBLIC_KEY;
+  
+  //fprintf(stderr, "(pAttributes[1].pValue:%d\n", );
+  myAttribute aAttribute[1] = {
+    {CKA_CLASS, &obj_class, sizeof(obj_class) }
+  };
+
   for (i=0;i<ulAttributeCount;++i)
     {
       jbyteArray data;
@@ -82,7 +100,7 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
 
       // TODO HACK
       pAttributes[i].ulValueLen = 8;
-      // TODO CHECK allocaCArrayFrom....
+      //TODO: look at allocaCArrayFromJByteArray function.
     }
 
   ret_obj_ids_sz = ENUM_HANDLES_BLOCK_SZ;
@@ -110,7 +128,9 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
   count = 0;
 
   rv = mod->method->C_FindObjects(hsession,obj_ids, ENUM_HANDLES_BLOCK_SZ, &count);
-
+#ifndef ANDROID
+  fprintf(stderr, "enumObjectsNative::count: %d\n", count);
+#endif
   if (rv  != CKR_OK)
     {
       jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
@@ -173,6 +193,16 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
   /* OK, akc it into JAVA's realm. */
   ret = (*env)->NewLongArray(env,nobjs);
   (*env)->SetLongArrayRegion(env,ret,0,nobjs,ret_obj_ids);
+
+#ifndef ANDROID
+  fprintf(stderr, "enumObjectsNative finished\n");
+#endif
+
+  // jlong* ids_ptr = ret_obj_ids;
+  // while (*ids_ptr) {
+  //     fprintf(stderr, "ret: %02X \n", *ids_ptr);
+  //     ids_ptr++;
+  // }
 
   free(ret_obj_ids);
   return ret;

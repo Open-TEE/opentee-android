@@ -26,14 +26,6 @@
 package org.opensc.pkcs11.spi;
 
 import android.util.Log;
-
-import org.opensc.pkcs11.PKCS11Provider;
-import org.opensc.pkcs11.wrap.PKCS11Exception;
-import org.opensc.pkcs11.wrap.PKCS11Mechanism;
-import org.opensc.pkcs11.wrap.PKCS11PrivateKey;
-import org.opensc.pkcs11.wrap.PKCS11PublicKey;
-import org.opensc.pkcs11.wrap.PKCS11SessionChild;
-
 import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -50,6 +42,13 @@ import javax.crypto.CipherSpi;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
+
+import org.opensc.pkcs11.PKCS11Provider;
+import org.opensc.pkcs11.wrap.PKCS11Exception;
+import org.opensc.pkcs11.wrap.PKCS11Mechanism;
+import org.opensc.pkcs11.wrap.PKCS11PrivateKey;
+import org.opensc.pkcs11.wrap.PKCS11PublicKey;
+import org.opensc.pkcs11.wrap.PKCS11SessionChild;
 
 /**
  * This class is the implementation of the cryptographic Cipher service
@@ -74,7 +73,7 @@ public class PKCS11CipherSpi extends CipherSpi
 	 * and algorithm. Usually, you will not have to call this contructor,
 	 * This class is implicitly instantiated using <tt>Cipher.getInstance</tt>
 	 * 
-	 * @see Cipher#getInstance(String, java.security.Provider)
+	 * @see javax.crypto.Cipher#getInstance(java.lang.String, java.security.Provider)
 	 * 
 	 */
 	public PKCS11CipherSpi(PKCS11Provider provider, String algorithm)

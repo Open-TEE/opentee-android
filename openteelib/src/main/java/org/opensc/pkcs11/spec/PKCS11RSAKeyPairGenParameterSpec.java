@@ -25,11 +25,11 @@
 
 package org.opensc.pkcs11.spec;
 
-import org.opensc.pkcs11.spi.PKCS11KeyPairGeneratorSpi;
-
 import java.math.BigInteger;
 import java.security.KeyStore.LoadStoreParameter;
 import java.security.spec.RSAKeyGenParameterSpec;
+
+import org.opensc.pkcs11.spi.PKCS11KeyPairGeneratorSpi;
 
 /**
  * This extension of {@link RSAKeyGenParameterSpec} is used to initialize the

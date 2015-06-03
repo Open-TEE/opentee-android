@@ -102,8 +102,11 @@ static CK_RV pkcs11_unlock_mutex(CK_VOID_PTR pMutex)
 #else
 
 #include <pthread.h>
-//#include <ltdl.h>
+#ifdef ANDROID
 #include <dlfcn.h>
+#else
+#include <ltdl.h>
+#endif /* ANDROID */
 
 static CK_RV pkcs11_create_mutex(CK_VOID_PTR_PTR ppMutex)
 {
@@ -235,12 +238,14 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
       goto failed;
     }
 #else
-  //if (lt_dlinit() != 0)
-    //{
-    //  jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
-    //                     "Unable ot initialize dynamic function loading.");
-    //  return 0;
-    //}
+#ifndef ANDROID
+  if (lt_dlinit() != 0)
+    {
+      jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
+                         "Unable ot initialize dynamic function loading.");
+      return 0;
+    }
+#endif /* ANDROID */
 
   getBytesId = (*env)->GetMethodID(env,sc,"getBytes","()[B");
 
@@ -263,12 +268,21 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
   (*env)->GetByteArrayRegion(env,filename8,0,sz,(jbyte*)mod->name);
   mod->name[sz] = 0;
 
+#ifdef ANDROID
   mod->handle = dlopen(mod->name, RTLD_NOW);
+#else
+  mod->handle = lt_dlopen(mod->name);
+#endif /* ANDROID */
 
   if (mod->handle == NULL)
     {
+#ifdef ANDROID
       jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
                          "Cannot open PKCS11 module %s: %s.",mod->name,dlerror());
+#else
+      jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
+                         "Cannot open PKCS11 module %s: %s.",mod->name,lt_dlerror());
+#endif /* ANDROID */
       goto failed;
     }
 #endif
@@ -284,14 +298,25 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
     }
 
 #else
+#ifdef ANDROID
   c_get_function_list = (CK_RV (*)(CK_FUNCTION_LIST_PTR_PTR))
     dlsym(mod->handle, "C_GetFunctionList");
+#else
+  c_get_function_list = (CK_RV (*)(CK_FUNCTION_LIST_PTR_PTR))
+    lt_dlsym(mod->handle, "C_GetFunctionList");
+#endif /* ANDROID */
 
   if (!c_get_function_list)
     {
+#ifdef ANDROID
       jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
                          "Cannot find function C_GetFunctionList in PKCS11 module %s: %s.",
                          mod->name,dlerror());
+#else
+      jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
+                         "Cannot find function C_GetFunctionList in PKCS11 module %s: %s.",
+                         mod->name,lt_dlerror());
+#endif /* ANDROID */
       goto failed;
     }
 #endif
@@ -338,17 +363,22 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
 failed:
   if (mod->name) free(mod->name);
 
+  if (mod->handle) {
 #ifdef WIN32
-  if (mod->handle)
     FreeLibrary(mod->handle);
 #else
-  if (mod->handle)
+#ifdef ANDROID
     dlclose(mod->handle);
+#else
+    lt_dlclose(mod->handle);
+#endif /* ANDROID */
 #endif
+  }
+
   free(mod);
 
-#ifndef WIN32
-  //lt_dlexit();
+#if !defined(WIN32) && !defined(ANDROID)
+  lt_dlexit();
 #endif
   return 0;
 }
@@ -383,20 +413,24 @@ void destroy_pkcs11_module(JNIEnv *env, pkcs11_module_t *mod)
   /* Tell the PKCS11 library to shut down */
   mod->method->C_Finalize(NULL);
 
+  if (mod->handle) {
 #ifdef WIN32
-  if (mod->handle)
     FreeLibrary(mod->handle);
 #else
-  if (mod->handle)
+#ifdef ANDROID
     dlclose(mod->handle);
+#else
+    lt_dlclose(mod->handle);
+#endif /* ANDROID */
 #endif
+  }
 
   if (mod->name) free(mod->name);
 
   memset(mod, 0, sizeof(pkcs11_module_t));
   free(mod);
 
-#ifndef WIN32
-  //lt_dlexit();
+#if !defined(WIN32) && !defined(ANDROID)
+  lt_dlexit();
 #endif
 }

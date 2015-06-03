@@ -25,6 +25,16 @@
 
 package org.opensc.pkcs11.spi;
 
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyPair;
+import java.security.KeyPairGeneratorSpi;
+import java.security.SecureRandom;
+import java.security.KeyStore.LoadStoreParameter;
+import java.security.spec.AlgorithmParameterSpec;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opensc.pkcs11.PKCS11Provider;
 import org.opensc.pkcs11.PKCS11SessionStore;
 import org.opensc.pkcs11.spec.PKCS11DSAKeyPairGenParameterSpec;
@@ -33,14 +43,6 @@ import org.opensc.pkcs11.wrap.PKCS11DSAKeyPairGenerator;
 import org.opensc.pkcs11.wrap.PKCS11Exception;
 import org.opensc.pkcs11.wrap.PKCS11KeyPairGenerator;
 import org.opensc.pkcs11.wrap.PKCS11RSAKeyPairGenerator;
-
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyPair;
-import java.security.KeyPairGeneratorSpi;
-import java.security.KeyStore.LoadStoreParameter;
-import java.security.SecureRandom;
-import java.security.spec.AlgorithmParameterSpec;
 
 /**
  * This is the PKCS11 implementation of the JCE KeyPairGenerator

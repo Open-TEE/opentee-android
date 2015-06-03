@@ -25,12 +25,12 @@
 
 package org.opensc.pkcs11.spec;
 
-import org.opensc.pkcs11.spi.PKCS11KeyPairGeneratorSpi;
-
 import java.security.spec.DSAParameterSpec;
 import java.security.spec.RSAKeyGenParameterSpec;
 
 import javax.crypto.spec.DHGenParameterSpec;
+
+import org.opensc.pkcs11.spi.PKCS11KeyPairGeneratorSpi;
 
 /**
  * This interface is implemented by all subclasses of

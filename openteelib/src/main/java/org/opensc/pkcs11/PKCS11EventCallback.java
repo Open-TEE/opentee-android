@@ -36,12 +36,12 @@ import javax.security.auth.callback.Callback;
  * An event callback is invoked each time
  * a defined event occurrs during the authentication process against a token.
  * 
- * @see KeyStore.CallbackHandlerProtection
+ * @see java.security.KeyStore.CallbackHandlerProtection
  * @see javax.security.auth.callback.CallbackHandler
- * @see KeyStore.LoadStoreParameter
+ * @see java.security.KeyStore.LoadStoreParameter
  * @see org.opensc.pkcs11.PKCS11LoadStoreParameter#getEventHandler()
  * @see org.opensc.pkcs11.PKCS11LoadStoreParameter#setEventHandler(CallbackHandler)
- * @see KeyStore#load(KeyStore.LoadStoreParameter)
+ * @see KeyStore#load(java.security.KeyStore.LoadStoreParameter)
  * 
  * @author wglas
  */

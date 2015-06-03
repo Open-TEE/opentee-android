@@ -26,14 +26,6 @@
 package org.opensc.pkcs11;
 
 import android.util.Log;
-
-import org.opensc.pkcs11.spec.PKCS11DSAKeyPairGenParameterSpec;
-import org.opensc.pkcs11.spec.PKCS11RSAKeyPairGenParameterSpec;
-import org.opensc.pkcs11.wrap.PKCS11Exception;
-import org.opensc.pkcs11.wrap.PKCS11SessionChild;
-import org.opensc.util.DestroyableHolder;
-import org.opensc.util.DestroyableParent;
-
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.security.Provider;
@@ -43,6 +35,13 @@ import java.security.interfaces.RSAKey;
 
 import javax.security.auth.DestroyFailedException;
 import javax.security.auth.Destroyable;
+
+import org.opensc.pkcs11.spec.PKCS11DSAKeyPairGenParameterSpec;
+import org.opensc.pkcs11.spec.PKCS11RSAKeyPairGenParameterSpec;
+import org.opensc.pkcs11.wrap.PKCS11Exception;
+import org.opensc.pkcs11.wrap.PKCS11SessionChild;
+import org.opensc.util.DestroyableHolder;
+import org.opensc.util.DestroyableParent;
 
 /**
  * The PKCS#11 provider of the OpenSC project.

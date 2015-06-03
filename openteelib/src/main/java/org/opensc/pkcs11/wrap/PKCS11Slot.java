@@ -25,14 +25,14 @@
 
 package org.opensc.pkcs11.wrap;
 
-import org.opensc.pkcs11.PKCS11Provider;
-import org.opensc.util.DestroyableHolder;
-
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.DestroyFailedException;
+
+import org.opensc.pkcs11.PKCS11Provider;
+import org.opensc.util.DestroyableHolder;
 
 public class PKCS11Slot extends DestroyableHolder
 {

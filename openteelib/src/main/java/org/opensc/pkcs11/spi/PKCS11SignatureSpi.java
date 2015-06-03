@@ -25,11 +25,6 @@
 
 package org.opensc.pkcs11.spi;
 
-import org.opensc.pkcs11.PKCS11Provider;
-import org.opensc.pkcs11.wrap.PKCS11Exception;
-import org.opensc.pkcs11.wrap.PKCS11Mechanism;
-import org.opensc.pkcs11.wrap.PKCS11SessionChild;
-
 import java.security.InvalidKeyException;
 import java.security.InvalidParameterException;
 import java.security.PrivateKey;
@@ -37,6 +32,11 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.SignatureSpi;
+
+import org.opensc.pkcs11.PKCS11Provider;
+import org.opensc.pkcs11.wrap.PKCS11Exception;
+import org.opensc.pkcs11.wrap.PKCS11Mechanism;
+import org.opensc.pkcs11.wrap.PKCS11SessionChild;
 
 /**
  * The signature service of the OpenSC PKCS#11 provider.
@@ -66,7 +66,7 @@ public class PKCS11SignatureSpi extends SignatureSpi
 	 * and algorithm. Usually, you will not have to call this contructor,
 	 * This class is implicitly instantiated using <tt>Signature.getInstance()</tt>.
 	 * 
-	 * @see java.security.Signature#getInstance(String, java.security.Provider)
+	 * @see java.security.Signature#getInstance(java.lang.String, java.security.Provider)
 	 */
 	public PKCS11SignatureSpi(PKCS11Provider provider, String algorithm)
 	{
