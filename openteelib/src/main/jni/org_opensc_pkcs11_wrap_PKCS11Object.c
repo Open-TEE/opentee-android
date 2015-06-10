@@ -99,7 +99,7 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
       allocaCArrayFromJByteArray(pAttributes[i].pValue,pAttributes[i].ulValueLen,env,data);
 
       // TODO HACK
-      pAttributes[i].ulValueLen = 8;
+      //pAttributes[i].ulValueLen = 8;
       //TODO: look at allocaCArrayFromJByteArray function.
     }
 
