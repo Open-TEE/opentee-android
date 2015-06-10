@@ -18,4 +18,15 @@ In either case you will need to also:
 3. update the openteelib/src/main/jni/prebuilt_libs directory with the latest android build of libtee and libtee_pkcs11
    as well as their header files in prebuilt_libs/libtee_include and prebuilt_libs/libtee_pkcs11_include
 
+##Usage
+
+1. Copy the generated library from openteelib/build/outputs/aar/openteelib-debug.aar to the libs/ folder of your module 
+2. Add it as a new module via `File/New/New Module.../Import existing AAR` in Android Studio to import the module.
+3. Add it as a dependency to your primary module by right clicking on your module/Module Settings/Dependencies/Module
+   and choose ":openteelib". This should modify the build.gradle of your module and add it automatically.
+
+##License
+
+This source code is available under the terms of the Apache License, Version 2.0:
+http://www.apache.org/licenses/LICENSE-2.0
 

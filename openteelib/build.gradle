@@ -13,13 +13,6 @@ android {
         versionCode 1
         versionName "1.0"
 
-        //ndk {
-        //    moduleName "libOpenSCjni"
-        //cFlags "-rdynamic -DANDROID -DOT_LOGGING -g -Wall -O2"
-        //ldLibs "dl", "log"
-        //stl "gnustl_static"
-        //abiFilter "armeabi", "armeabi-v7a", "x86"
-        //}
     }
 
     // START Config for ndk-build to be called when Building through gradle
