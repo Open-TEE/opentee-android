@@ -31,11 +31,14 @@ import java.util.List;
 
 import javax.security.auth.DestroyFailedException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opensc.pkcs11.PKCS11Provider;
 import org.opensc.util.DestroyableHolder;
 
 public class PKCS11Slot extends DestroyableHolder
 {
+	static private final Log log = LogFactory.getLog(PKCS11Slot.class);
 
 	/**
 	 * The ID of the token.
@@ -134,7 +137,8 @@ public class PKCS11Slot extends DestroyableHolder
 									slot.destroy();
 								} catch (DestroyFailedException e1)
 								{
-									android.util.Log.w("PKCS11Slot", "destroy error while waiting for slot:" + e1);
+									log.warn("destroy error while waiting for slot:",
+											e1);
 								}
 						}
 					} while (ret == null);

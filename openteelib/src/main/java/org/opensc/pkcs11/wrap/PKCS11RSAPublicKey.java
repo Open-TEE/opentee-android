@@ -54,11 +54,11 @@ public class PKCS11RSAPublicKey extends PKCS11PublicKey implements RSAPublicKey
 	{
 		super(session, CKK_RSA, handle);
 		
-//		byte [] raw_modulus = getRawAttribute(PKCS11Attribute.CKA_MODULUS);
-//		this.modulus = new BigInteger(raw_modulus);
+		byte [] raw_modulus = getRawAttribute(PKCS11Attribute.CKA_MODULUS);
+		this.modulus = new BigInteger(raw_modulus);
 		
-//		byte [] raw_exp = getRawAttribute(PKCS11Attribute.CKA_PUBLIC_EXPONENT);
-//		this.publicExponent = new BigInteger(raw_exp);
+		byte [] raw_exp = getRawAttribute(PKCS11Attribute.CKA_PUBLIC_EXPONENT);
+		this.publicExponent = new BigInteger(raw_exp);
 	}
 
 	/* (non-Javadoc)

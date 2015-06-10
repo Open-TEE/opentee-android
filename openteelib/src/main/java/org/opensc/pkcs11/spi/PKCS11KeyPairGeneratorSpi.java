@@ -52,7 +52,7 @@ import org.opensc.pkcs11.wrap.PKCS11RSAKeyPairGenerator;
  */
 public class PKCS11KeyPairGeneratorSpi extends KeyPairGeneratorSpi
 {
-    private static final String TAG = "PKCS11KeyPairGeneratorSpi";
+    static Log log = LogFactory.getLog(PKCS11KeyPairGeneratorSpi.class);
 
     private PKCS11Provider provider;
     private String algorithm;

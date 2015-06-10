@@ -25,7 +25,6 @@
 
 package org.opensc.pkcs11.spi;
 
-import android.util.Log;
 import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -43,6 +42,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opensc.pkcs11.PKCS11Provider;
 import org.opensc.pkcs11.wrap.PKCS11Exception;
 import org.opensc.pkcs11.wrap.PKCS11Mechanism;
@@ -58,8 +59,8 @@ import org.opensc.pkcs11.wrap.PKCS11SessionChild;
  */
 public class PKCS11CipherSpi extends CipherSpi
 {
-	private static String TAG = "PKCS11CipherSpi";
-
+	static Log log = LogFactory.getLog(PKCS11CipherSpi.class);
+	
 	PKCS11Provider provider;
 	String algorithm;
 	PKCS11SessionChild worker;
@@ -326,7 +327,7 @@ public class PKCS11CipherSpi extends CipherSpi
 			
 		} catch (PKCS11Exception e)
 		{
-			Log.e(TAG, "PKCS11Exception caught:" + e);
+			log.error("PKCS11Exception caught:",e);
 		}
 		
 		return null;
@@ -359,7 +360,7 @@ public class PKCS11CipherSpi extends CipherSpi
 			
 		} catch (PKCS11Exception e)
 		{
-			Log.e(TAG, "PKCS11Exception caught:" + e);
+			log.error("PKCS11Exception caught:",e);
 			throw new ShortBufferException("PKCS11 exception:"+e);
 		}
 	}
@@ -398,7 +399,7 @@ public class PKCS11CipherSpi extends CipherSpi
 			
 		} catch (PKCS11Exception e)
 		{
-			Log.e(TAG, "PKCS11Exception caught:" + e);
+			log.error("PKCS11Exception caught:",e);
 			throw new IllegalBlockSizeException("PKCS11Exception caught:"+e);
 		}
 		this.count = 0;
@@ -448,7 +449,7 @@ public class PKCS11CipherSpi extends CipherSpi
 			
 		} catch (PKCS11Exception e)
 		{
-			Log.e(TAG, "PKCS11Exception caught:" + e);
+			log.error("PKCS11Exception caught:",e);
 			throw new ShortBufferException("PKCS11 exception:"+e);
 		}
 		

@@ -25,12 +25,6 @@
 
 package org.opensc.pkcs11;
 
-import android.util.Log;
-
-import org.opensc.pkcs11.wrap.PKCS11Exception;
-import org.opensc.pkcs11.wrap.PKCS11Session;
-import org.opensc.pkcs11.wrap.PKCS11Slot;
-
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStore.CallbackHandlerProtection;
@@ -45,6 +39,12 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.opensc.pkcs11.wrap.PKCS11Exception;
+import org.opensc.pkcs11.wrap.PKCS11Session;
+import org.opensc.pkcs11.wrap.PKCS11Slot;
+
 /**
  * This class is used to establish a session on the token, wherever
  * a SPI implementation needs to do so.
@@ -55,7 +55,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  */
 public class PKCS11SessionStore implements LoadStoreParameter
 {
-    private static String TAG = "PKCS11SessionStore";
+    private static Log log = LogFactory.getLog(PKCS11SessionStore.class);
     
     PKCS11Slot slot;
     PKCS11Session session;
@@ -84,7 +84,7 @@ public class PKCS11SessionStore implements LoadStoreParameter
             this.eventHandler.handle(new Callback[]{this.cb});
         } catch (UnsupportedCallbackException e)
         {
-            Log.w(TAG, "PKCSEventCallback not supported by CallbackHandler [" + this.eventHandler.getClass() + "]" + e);
+            log.warn("PKCSEventCallback not supported by CallbackHandler ["+this.eventHandler.getClass()+"]",e);
         }
     }
     
@@ -314,7 +314,7 @@ public class PKCS11SessionStore implements LoadStoreParameter
                 this.slot.destroy();
             } catch (DestroyFailedException e)
             {
-                Log.w(TAG, "Cannot destroy slot:" + e);
+                log.warn("Cannot destroy slot:",e);
             }
         }        
         

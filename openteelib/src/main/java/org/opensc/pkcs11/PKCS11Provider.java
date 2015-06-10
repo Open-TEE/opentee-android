@@ -25,7 +25,6 @@
 
 package org.opensc.pkcs11;
 
-import android.util.Log;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.security.Provider;
@@ -36,6 +35,8 @@ import java.security.interfaces.RSAKey;
 import javax.security.auth.DestroyFailedException;
 import javax.security.auth.Destroyable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opensc.pkcs11.spec.PKCS11DSAKeyPairGenParameterSpec;
 import org.opensc.pkcs11.spec.PKCS11RSAKeyPairGenParameterSpec;
 import org.opensc.pkcs11.wrap.PKCS11Exception;
@@ -53,7 +54,7 @@ import org.opensc.util.DestroyableParent;
  */
 public class PKCS11Provider extends Provider implements DestroyableParent
 {
-	private static String TAG = "PKCS11Provider";
+	static private final Log log = LogFactory.getLog(PKCS11Provider.class);
 
 	/**
 	 * To be changed, when the interface changes.
@@ -104,7 +105,7 @@ public class PKCS11Provider extends Provider implements DestroyableParent
                 this.destroyableHolder.destroy();
 			} catch (DestroyFailedException e)
 			{
-				Log.e(TAG, "Failure during destruction of C resources:" + e);
+				log.error("Failure during destruction of C resources:",e);
 			}
 			
 			try
@@ -112,7 +113,7 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 				unloadPKCS11Module(this.pkcs11ModuleHandle);
 			} catch (PKCS11Exception e)
 			{
-				Log.e(TAG, "Failure unloading PKCS#11 module:" + e);
+				log.error("Failure unloading PKCS#11 module:",e);
 			}
 			
             this.pkcs11ModuleHandle = 0L;

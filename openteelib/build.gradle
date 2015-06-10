@@ -99,7 +99,6 @@ def getNdkDir() {
 
 
 dependencies {
-    compile (
-            fileTree(dir: 'libs', include: ['*.jar'])
-    )
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile files('libs/commons-logging-1.2.jar')
 }
