@@ -1,18 +1,15 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "fi.aalto.opentee"
-        minSdkVersion 22
+        minSdkVersion 21
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
-
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -23,16 +20,8 @@ android {
             jniDebuggable true
         }
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
-
 }
-
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':openteelib')
 }
