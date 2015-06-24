@@ -1,6 +1,7 @@
 package fi.aalto.opentee;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,6 +19,8 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Random;
 
+import fi.aalto.ssg.opentee_mainapp.OpenTEEService;
+
 
 public class MainActivity extends Activity {
 
@@ -27,6 +30,21 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        startService(new Intent(this, OpenTEEService.class));
+        //testPKCS11();
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        stopService(new Intent(this, OpenTEEService.class));
+
+        super.onDestroy();
+    }
+
+
+    private void testPKCS11() {
         try {
             setUp();
             testKeyStore();
@@ -85,15 +103,8 @@ public class MainActivity extends Activity {
     protected byte[] testData;
 
     public void setUp() throws IOException {
-        // Add provider "SunPKCS11-OpenSC"
-        String pkcs11_path;
 
-        if (System.getProperty("os.name").contains("Windows"))
-            pkcs11_path = System.getenv("ProgramFiles")+"\\Smart Card Bundle\\opensc-pkcs11.dll";
-        else
-            pkcs11_path = "libtee_pkcs11.so"; // TODO PASS LOCAL BUNDLED .SO FILE
-
-        this.provider = new PKCS11Provider(pkcs11_path);
+        this.provider = new PKCS11Provider( "libtee_pkcs11.so");
         Security.addProvider(this.provider);
 
         Provider providers[] = Security.getProviders();
