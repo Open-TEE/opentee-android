@@ -13,7 +13,9 @@ import android.os.Message;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 
@@ -40,11 +42,12 @@ public class OpenTEEService extends Service {
             super(looper);
             mContext = new WeakReference<Context>(context);
         }
+
         @Override
         public void handleMessage(Message msg) {
             // Normally we would do some work here, like download a file.
             // For our sample, we just sleep for 5 seconds.
-            Log.i(OPEN_TEE_SERVICE_TAG, "CPU ABI " + Arrays.toString(Build.SUPPORTED_ABIS) );
+            Log.i(OPEN_TEE_SERVICE_TAG, "CPU ABI " + Arrays.toString(Build.SUPPORTED_ABIS));
 
             // Stop the service using the startId, so that we don't stop
             // the service in the middle of handling another job
@@ -110,20 +113,38 @@ public class OpenTEEService extends Service {
             public void run() {
                 try {
                     String output = "";
-                    String destPath = context.getApplicationInfo().dataDir + File.separator + binaryName;
-                    String originAssetPath = Build.SUPPORTED_ABIS[0] + File.separator + binaryName;
-                    Log.d(OPEN_TEE_SERVICE_TAG, "Home Dir: " + destPath);
+                    String destPath = getFullBinaryDataPath(context, binaryName);
 
-                    Log.d(OPEN_TEE_SERVICE_TAG, "Copying " + originAssetPath + " TO " + destPath);
-                    Utils.copyFromAssetsToAppDir(context, originAssetPath, destPath);
-                    output = Utils.execUnixCommand("/system/bin/chmod 744 " + destPath);
-                    Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
+                    // Asset folder containing the binary based on the first
+                    // supported CPU architecture (ABI) (i.e. armeabi, armeabi-v7a, x86)
+                    String originAssetPath = Build.SUPPORTED_ABIS[0] + File.separator + binaryName;
+                    Log.d(OPEN_TEE_SERVICE_TAG, "App Data home Dir: " + destPath);
+
+                    File outBinFile = new File(destPath);
+
+                    // If the file doesn't exist
+                    if (!outBinFile.exists()) {
+                        // Copy and chmod the new file
+                        InputStream inBinFile = context.getAssets().open(originAssetPath);
+                        Log.d(OPEN_TEE_SERVICE_TAG, "Copying " + originAssetPath + " TO " + destPath);
+                        Utils.copyStream(context,
+                                inBinFile,
+                                new FileOutputStream(outBinFile, false)); // we don't want to append, just (over)write
+                        output = Utils.execUnixCommand("/system/bin/chmod 744 " + destPath);
+                        Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
+                    }
+
                 } catch (InterruptedException | IOException e) {
                     Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                    e.printStackTrace();
                 }
             }
         });
         thread.start();
+    }
+
+    private static String getFullBinaryDataPath(Context context, String binaryName) {
+        return context.getApplicationInfo().dataDir + File.separator + binaryName;
     }
 
     private void execBinaryFromHomeDir(final Context context, final String binaryName) {
@@ -131,7 +152,7 @@ public class OpenTEEService extends Service {
             public void run() {
                 try {
                     String output = "";
-                    String destPath = context.getApplicationInfo().dataDir + File.separator + binaryName;
+                    String destPath = getFullBinaryDataPath(context, binaryName);
                     output = Utils.execUnixCommand(destPath);
                     Log.d(OPEN_TEE_SERVICE_TAG, "Execution of binary returned: " + output);
                 } catch (InterruptedException | IOException e) {
