@@ -1,6 +1,7 @@
 package fi.aalto.ssg.opentee_mainapp;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
@@ -10,6 +11,9 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 
 public class OpenTEEService extends Service {
@@ -21,14 +25,19 @@ public class OpenTEEService extends Service {
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
-        public ServiceHandler(Looper looper) {
+        // A weak reference to the enclosing context
+        private WeakReference<Context> mContext;
+
+        public ServiceHandler(Context context, Looper looper) {
             super(looper);
+            mContext = new WeakReference<Context>(context);
         }
         @Override
         public void handleMessage(Message msg) {
             // Normally we would do some work here, like download a file.
             // For our sample, we just sleep for 5 seconds.
             Log.i(OPEN_TEE_SERVICE_TAG, "CPU ABI " + Arrays.toString(Build.SUPPORTED_ABIS) + " " + System.getProperty("os.arch") );
+            installBinaryToHomeDir(mContext.get(), "opentee-engine");
 
             // Stop the service using the startId, so that we don't stop
             // the service in the middle of handling another job
@@ -46,7 +55,7 @@ public class OpenTEEService extends Service {
 
         // Get the HandlerThread's Looper and use it for our Handler
         mServiceLooper = thread.getLooper();
-        mServiceHandler = new ServiceHandler(mServiceLooper);
+        mServiceHandler = new ServiceHandler(getApplicationContext(), mServiceLooper);
     }
 
     @Override
@@ -83,4 +92,26 @@ public class OpenTEEService extends Service {
         mServiceHandler.post(proc);
     }
 
+    private void installBinaryToHomeDir(final Context context, final String binaryName) {
+        final String destPath = context.getApplicationInfo().dataDir + File.separator + binaryName;
+        final String originAssetPath = Build.SUPPORTED_ABIS[0] + File.separator + binaryName;
+        Log.i(OPEN_TEE_SERVICE_TAG, "Home Dir: " + destPath);
+
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    String output = "";
+                    Log.i(OPEN_TEE_SERVICE_TAG, "Copying " + originAssetPath + " TO " + destPath);
+                    Utils.copyFromAssetsToAppDir(context, originAssetPath, destPath);
+                    output = Utils.execUnixCommand("/system/bin/chmod 744 " + destPath);
+                    Log.i(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
+                    //output = Utils.execUnixCommand(destPath);
+                    //Log.i(OPEN_TEE_SERVICE_TAG, "Execution of binary returned: " + output);
+                } catch (InterruptedException | IOException e) {
+                    Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                }
+            }
+        });
+        thread.start();
+    }
 }

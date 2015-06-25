@@ -1,7 +1,11 @@
 package fi.aalto.ssg.opentee_mainapp;
 
+import android.content.Context;
+
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
@@ -10,8 +14,7 @@ import java.io.InputStreamReader;
 public class Utils {
 
     // Executes UNIX command.
-    public static String execUnixCommand(String command) {
-        try {
+    public static String execUnixCommand(String command) throws IOException, InterruptedException {
             Process process = Runtime.getRuntime().exec(command);
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(process.getInputStream()));
@@ -24,10 +27,20 @@ public class Utils {
             reader.close();
             process.waitFor();
             return output.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
+
+    public static void copyFromAssetsToAppDir(Context context, String assetFile, String outputPath) throws IOException {
+            InputStream in = context.getAssets().open(assetFile);
+
+            FileOutputStream out = new FileOutputStream(outputPath);
+            int read;
+            byte[] buffer = new byte[4096];
+            while ((read = in.read(buffer)) > 0) {
+                out.write(buffer, 0, read);
+            }
+            out.close();
+            in.close();
+    }
+
+
 }
