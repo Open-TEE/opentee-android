@@ -39,7 +39,8 @@ public class OpenTEEService extends Service {
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
     private static final String OPENTEE_DIR_CONF_PLACEHOLDER = "OPENTEEDIR";
-    ;
+    // Used as name for the directory containing our whole installation
+    private static final String OPENTEE = "opentee";
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
@@ -208,9 +209,9 @@ public class OpenTEEService extends Service {
         thread.start();
     }
 
-    // TODO make this return a directory under /opentee/ ...
     private static String getFullFileDataPath(Context context) {
-        return context.getApplicationInfo().dataDir;
+        File dataPath = Utils.checkAndCreateDir(context.getApplicationInfo().dataDir + File.separator + OPENTEE);
+        return dataPath.getAbsolutePath();
     }
 
     private void execBinaryFromHomeDir(final Context context, final String binaryName) {

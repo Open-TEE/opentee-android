@@ -1,8 +1,10 @@
 package fi.aalto.ssg.opentee_mainapp;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,4 +42,16 @@ public class Utils {
     }
 
 
+    public static File checkAndCreateDir(String dirPath) {
+        File dataPath = new File(dirPath);
+        if (!dataPath.isDirectory()) {
+            try {
+                dataPath.mkdirs();
+            } catch (SecurityException e) {
+                Log.e(OpenTEEService.OPEN_TEE_SERVICE_TAG, e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return dataPath;
+    }
 }
