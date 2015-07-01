@@ -211,11 +211,14 @@ public class OpenTEEService extends Service {
 
                 // If the file doesn't exist
                 if (!outConfFile.exists()) {
-                    try (InputStream inConfFile = context.getAssets().open(confFileName)) {
+                    try (BufferedReader inReader =
+                                 new BufferedReader(
+                                         new InputStreamReader(
+                                                 context.getAssets().open(confFileName)
+                                                 , "UTF-8"))) {
                         // Copy and chmod the new file
                         Log.d(OPEN_TEE_SERVICE_TAG, "Copying " + destPath + " TO " + destPath);
 
-                        BufferedReader inReader = new BufferedReader(new InputStreamReader(inConfFile, "UTF-8"));
                         try (PrintWriter outWriter = new PrintWriter(outConfFile, "UTF-8")) {
 
                             String line = null;
@@ -228,6 +231,8 @@ public class OpenTEEService extends Service {
                         } catch (IOException e) {
                             Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
                             e.printStackTrace();
+                        } finally {
+                            inReader.close();
                         }
                         output = Utils.execUnixCommand("/system/bin/chmod 640 " + destPath);
                         Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
