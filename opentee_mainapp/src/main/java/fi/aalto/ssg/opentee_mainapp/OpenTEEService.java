@@ -26,21 +26,39 @@ public class OpenTEEService extends Service {
 
     public static final String OPEN_TEE_SERVICE_TAG = "OpenTEEService";
 
-    public static final String OPENTEE_ENGINE_BIN_NAME = "opentee-engine";
-    public static final String OPENTEE_ENGINE_CONF_NAME = "opentee.conf.android";
+    // Used as name for the directory containing our whole installation
+    public static final String OPENTEE_DIR_NAME = "opentee";
+    public static final String OPENTEE_BIN_DIR = "bin";
+    public static final String OPENTEE_TA_DIR = "ta";
+    public static final String OPENTEE_TEE_DIR ="tee";
+
+    // These describe where the files are located in the assets/
+    public static final String OPENTEE_ENGINE_ASSET_BIN_NAME = "opentee-engine";
+    public static final String STORAGE_TEST_ASSET_BIN_NAME = "storage_test";
+    public static final String STORAGE_TEST_CA_ASSET_BIN_NAME = "storage_test_ca";
+    public static final String PKCS11_TEST_ASSET_BIN_NAME = "pkcs11_test";
+    public static final String LIB_TA_STORAGE_TEST_ASSET_TA_NAME = "libta_storage_test.so";
+    public static final String LIB_TA_PKCS11_ASSET_TA_NAME = "libta_pkcs11_ta.so";
+    public static final String LIB_TA_CONN_TEST_APP_ASSET_TA_NAME = "libta_conn_test_app.so";
+    public static final String LIB_LAUNCHER_API_ASSET_TEE_NAME = "libLauncherApi.so";
+    public static final String LIB_MANAGER_API_ASSET_TEE_NAME = "libManagerApi.so";
+
+    public static final String OPENTEE_CONF_NAME = "opentee.conf.android";
+
+    // Placeholder used in the assets/opentee.conf.android to be replaced at installation with the app data home dir
+    public static final String OPENTEE_DIR_CONF_PLACEHOLDER = "OPENTEEDIR";
 
     // Fields used for passing around data in messages
-    private static final int MSG_INSTALL_BIN = 1;
+    private static final int MSG_INSTALL_ASSET = 1;
     private static final int MSG_INSTALL_CONF = 2;
-    private static final int MSG_RUN_BIN = 3;
-    private static final String MSG_BINARY_NAME = "MSG_BINARY_NAME";
+    private static final int MSG_INSTALL_ALL = 3;
+    private static final int MSG_RUN_BIN = 4;
+    private static final String MSG_ASSET_NAME = "MSG_ASSET_NAME";
+    private static final String MSG_ASSET_SUBDIR = "MSG_ASSET_SUBDIR";
     private static final String MSG_CONF_NAME = "MSG_CONF_NAME";
 
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
-    private static final String OPENTEE_DIR_CONF_PLACEHOLDER = "OPENTEEDIR";
-    // Used as name for the directory containing our whole installation
-    private static final String OPENTEE = "opentee";
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
@@ -63,14 +81,26 @@ public class OpenTEEService extends Service {
             //stopSelf(msg.arg1);
             Bundle data = msg.getData();
             switch (msg.what) {
-                case OpenTEEService.MSG_INSTALL_BIN:
-                    installBinaryToHomeDir(mContext.get(), data.getString(MSG_BINARY_NAME));
+                case OpenTEEService.MSG_INSTALL_ASSET:
+                    installAssetToHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME), data.getString(MSG_ASSET_SUBDIR));
                     break;
                 case OpenTEEService.MSG_INSTALL_CONF:
                     installConfigToHomeDir(mContext.get(), data.getString(MSG_CONF_NAME));
                     break;
                 case OpenTEEService.MSG_RUN_BIN:
-                    execBinaryFromHomeDir(mContext.get(), data.getString(MSG_BINARY_NAME));
+                    execBinaryFromHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME));
+                    break;
+                case OpenTEEService.MSG_INSTALL_ALL:
+                    installConfigToHomeDir(mContext.get(), OPENTEE_CONF_NAME);
+                    installAssetToHomeDir(mContext.get(), OPENTEE_ENGINE_ASSET_BIN_NAME, OPENTEE_BIN_DIR);
+                    installAssetToHomeDir(mContext.get(), STORAGE_TEST_ASSET_BIN_NAME, OPENTEE_BIN_DIR);
+                    installAssetToHomeDir(mContext.get(), STORAGE_TEST_CA_ASSET_BIN_NAME, OPENTEE_BIN_DIR);
+                    installAssetToHomeDir(mContext.get(), PKCS11_TEST_ASSET_BIN_NAME, OPENTEE_BIN_DIR);
+                    installAssetToHomeDir(mContext.get(), LIB_TA_STORAGE_TEST_ASSET_TA_NAME, OPENTEE_TA_DIR);
+                    installAssetToHomeDir(mContext.get(), LIB_TA_PKCS11_ASSET_TA_NAME, OPENTEE_TA_DIR);
+                    installAssetToHomeDir(mContext.get(), LIB_TA_CONN_TEST_APP_ASSET_TA_NAME, OPENTEE_TA_DIR);
+                    installAssetToHomeDir(mContext.get(), LIB_LAUNCHER_API_ASSET_TEE_NAME, OPENTEE_TEE_DIR);
+                    installAssetToHomeDir(mContext.get(), LIB_MANAGER_API_ASSET_TEE_NAME, OPENTEE_TEE_DIR);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -97,11 +127,11 @@ public class OpenTEEService extends Service {
 
         // For each start request, send a message to start a job and deliver the
         // start ID so we know which request we're stopping when we finish the job
-        Message msg = mServiceHandler.obtainMessage(MSG_INSTALL_CONF);
-        msg.arg1 = startId;
-        Bundle b = new Bundle();
-        b.putString(MSG_CONF_NAME, OPENTEE_ENGINE_CONF_NAME);
-        msg.setData(b);
+        Message msg = mServiceHandler.obtainMessage(MSG_INSTALL_ALL );
+        //Bundle b = new Bundle();
+        //b.putString(MSG_ASSET_NAME, OPENTEE_ENGINE_ASSET_BIN_NAME);
+        //b.putString(MSG_ASSET_SUBDIR, OPENTEE_BIN_DIR);
+        //msg.setData(b);
         mServiceHandler.sendMessage(msg);
 
         // If we get killed, after returning from here, restart
@@ -119,28 +149,33 @@ public class OpenTEEService extends Service {
         Log.i(OPEN_TEE_SERVICE_TAG, "Service stopped");
     }
 
-    private void installBinaryToHomeDir(final Context context, final String binaryName) {
+    private void installAssetToHomeDir(final Context context, final String assetName, final String subdir) {
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 String output = "";
-                String destPath = getFullFileDataPath(context) + File.separator + binaryName;
-
+                String destPath = Utils.getFullFileDataPath(context);
+                // if you have to install in a subdir, check and create it if necessary
+                if (subdir != null) {
+                    destPath += File.separator + subdir;
+                    Utils.checkAndCreateDir(destPath);
+                }
+                destPath += File.separator + assetName;
                 // Asset folder containing the binary based on the first
                 // supported CPU architecture (ABI) (i.e. armeabi, armeabi-v7a, x86)
-                String originAssetPath = Build.SUPPORTED_ABIS[0] + File.separator + binaryName;
+                String originAssetPath = Build.SUPPORTED_ABIS[0] + File.separator + assetName;
                 Log.d(OPEN_TEE_SERVICE_TAG, "App Data home Dir: " + destPath);
 
-                File outBinFile = new File(destPath);
+                File outFile = new File(destPath);
 
                 // If the file doesn't exist
-                if (!outBinFile.exists()) {
+                if (!outFile.exists()) {
                     // Copy and chmod the new file
-                    try (InputStream inBinFile = context.getAssets().open(originAssetPath)) {
+                    try (InputStream inFile = context.getAssets().open(originAssetPath)) {
 
                         Log.d(OPEN_TEE_SERVICE_TAG, "Copying " + originAssetPath + " TO " + destPath);
                         Utils.copyStream(context,
-                                inBinFile,
-                                new FileOutputStream(outBinFile, false)); // we don't want to append, just (over)write
+                                inFile,
+                                new FileOutputStream(outFile, false)); // we don't want to append, just (over)write
                         output = Utils.execUnixCommand("/system/bin/chmod 744 " + destPath);
                         Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
                     } catch (IOException | InterruptedException e) {
@@ -166,7 +201,7 @@ public class OpenTEEService extends Service {
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 String output = "";
-                String destPath = getFullFileDataPath(context) + File.separator + confFileName;
+                String destPath = Utils.getFullFileDataPath(context) + File.separator + confFileName;
 
                 // Asset folder containing the binary based on the first
                 // supported CPU architecture (ABI) (i.e. armeabi, armeabi-v7a, x86)
@@ -185,7 +220,7 @@ public class OpenTEEService extends Service {
 
                             String line = null;
                             while ((line = inReader.readLine()) != null) {
-                                line = line.replaceAll("\\b" + OPENTEE_DIR_CONF_PLACEHOLDER + "\\b", getFullFileDataPath(context));
+                                line = line.replaceAll("\\b" + OPENTEE_DIR_CONF_PLACEHOLDER + "\\b", Utils.getFullFileDataPath(context));
                                 System.out.println(line);
                                 outWriter.println(line);
                             }
@@ -209,17 +244,12 @@ public class OpenTEEService extends Service {
         thread.start();
     }
 
-    private static String getFullFileDataPath(Context context) {
-        File dataPath = Utils.checkAndCreateDir(context.getApplicationInfo().dataDir + File.separator + OPENTEE);
-        return dataPath.getAbsolutePath();
-    }
-
     private void execBinaryFromHomeDir(final Context context, final String binaryName) {
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 try {
                     String output = "";
-                    String destPath = getFullFileDataPath(context) + File.separator + binaryName;
+                    String destPath = Utils.getFullFileDataPath(context) + File.separator + binaryName;
                     output = Utils.execUnixCommand(destPath);
                     Log.d(OPEN_TEE_SERVICE_TAG, "Execution of binary returned: " + output);
                 } catch (InterruptedException | IOException e) {

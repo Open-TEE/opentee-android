@@ -54,4 +54,9 @@ public class Utils {
         }
         return dataPath;
     }
+
+    static String getFullFileDataPath(Context context) {
+        File dataPath = checkAndCreateDir(context.getApplicationInfo().dataDir + File.separator + OpenTEEService.OPENTEE_DIR_NAME);
+        return dataPath.getAbsolutePath();
+    }
 }
