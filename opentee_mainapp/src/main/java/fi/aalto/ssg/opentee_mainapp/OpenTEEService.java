@@ -56,6 +56,7 @@ public class OpenTEEService extends Service {
     private static final String MSG_ASSET_NAME = "MSG_ASSET_NAME";
     private static final String MSG_ASSET_SUBDIR = "MSG_ASSET_SUBDIR";
     private static final String MSG_CONF_NAME = "MSG_CONF_NAME";
+    private static final String MSG_OVERWRITE = "MSG_OVERWRITE";
 
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
@@ -82,7 +83,7 @@ public class OpenTEEService extends Service {
             Bundle data = msg.getData();
             switch (msg.what) {
                 case OpenTEEService.MSG_INSTALL_ASSET:
-                    installAssetToHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME), data.getString(MSG_ASSET_SUBDIR));
+                    installAssetToHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME), data.getString(MSG_ASSET_SUBDIR), data.getBoolean(MSG_OVERWRITE));
                     break;
                 case OpenTEEService.MSG_INSTALL_CONF:
                     installConfigToHomeDir(mContext.get(), data.getString(MSG_CONF_NAME));
@@ -92,15 +93,16 @@ public class OpenTEEService extends Service {
                     break;
                 case OpenTEEService.MSG_INSTALL_ALL:
                     installConfigToHomeDir(mContext.get(), OPENTEE_CONF_NAME);
-                    installAssetToHomeDir(mContext.get(), OPENTEE_ENGINE_ASSET_BIN_NAME, OPENTEE_BIN_DIR);
-                    installAssetToHomeDir(mContext.get(), STORAGE_TEST_ASSET_BIN_NAME, OPENTEE_BIN_DIR);
-                    installAssetToHomeDir(mContext.get(), STORAGE_TEST_CA_ASSET_BIN_NAME, OPENTEE_BIN_DIR);
-                    installAssetToHomeDir(mContext.get(), PKCS11_TEST_ASSET_BIN_NAME, OPENTEE_BIN_DIR);
-                    installAssetToHomeDir(mContext.get(), LIB_TA_STORAGE_TEST_ASSET_TA_NAME, OPENTEE_TA_DIR);
-                    installAssetToHomeDir(mContext.get(), LIB_TA_PKCS11_ASSET_TA_NAME, OPENTEE_TA_DIR);
-                    installAssetToHomeDir(mContext.get(), LIB_TA_CONN_TEST_APP_ASSET_TA_NAME, OPENTEE_TA_DIR);
-                    installAssetToHomeDir(mContext.get(), LIB_LAUNCHER_API_ASSET_TEE_NAME, OPENTEE_TEE_DIR);
-                    installAssetToHomeDir(mContext.get(), LIB_MANAGER_API_ASSET_TEE_NAME, OPENTEE_TEE_DIR);
+                    boolean overwrite = data.getBoolean(MSG_OVERWRITE);
+                    installAssetToHomeDir(mContext.get(), OPENTEE_ENGINE_ASSET_BIN_NAME, OPENTEE_BIN_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), STORAGE_TEST_ASSET_BIN_NAME, OPENTEE_BIN_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), STORAGE_TEST_CA_ASSET_BIN_NAME, OPENTEE_BIN_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), PKCS11_TEST_ASSET_BIN_NAME, OPENTEE_BIN_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), LIB_TA_STORAGE_TEST_ASSET_TA_NAME, OPENTEE_TA_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), LIB_TA_PKCS11_ASSET_TA_NAME, OPENTEE_TA_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), LIB_TA_CONN_TEST_APP_ASSET_TA_NAME, OPENTEE_TA_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), LIB_LAUNCHER_API_ASSET_TEE_NAME, OPENTEE_TEE_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), LIB_MANAGER_API_ASSET_TEE_NAME, OPENTEE_TEE_DIR, overwrite);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -125,13 +127,22 @@ public class OpenTEEService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(OPEN_TEE_SERVICE_TAG, "Service starting");
 
-        // For each start request, send a message to start a job and deliver the
-        // start ID so we know which request we're stopping when we finish the job
-        Message msg = mServiceHandler.obtainMessage(MSG_INSTALL_ALL );
-        //Bundle b = new Bundle();
-        //b.putString(MSG_ASSET_NAME, OPENTEE_ENGINE_ASSET_BIN_NAME);
-        //b.putString(MSG_ASSET_SUBDIR, OPENTEE_BIN_DIR);
-        //msg.setData(b);
+        // For each start request, send a message to start a job
+        // INSTALL ALL
+//        Message msg = mServiceHandler.obtainMessage(MSG_INSTALL_ALL );
+//        Bundle b = new Bundle();
+//        //b.putString(MSG_ASSET_NAME, OPENTEE_ENGINE_ASSET_BIN_NAME);
+//        b.putBoolean(MSG_OVERWRITE, true);
+//        msg.setData(b);
+//        mServiceHandler.sendMessage(msg);
+        // RUN OPENTEE
+        Message msg = mServiceHandler.obtainMessage(MSG_RUN_BIN );
+        Bundle b = new Bundle();
+        String dataHomeDir = Utils.getFullFileDataPath(getApplicationContext());
+        b.putString(MSG_ASSET_NAME, OPENTEE_BIN_DIR + File.separator + OPENTEE_ENGINE_ASSET_BIN_NAME + " -c "
+                + dataHomeDir + File.separator + OPENTEE_CONF_NAME
+                + " -p " + dataHomeDir);
+        msg.setData(b);
         mServiceHandler.sendMessage(msg);
 
         // If we get killed, after returning from here, restart
@@ -149,7 +160,7 @@ public class OpenTEEService extends Service {
         Log.i(OPEN_TEE_SERVICE_TAG, "Service stopped");
     }
 
-    private void installAssetToHomeDir(final Context context, final String assetName, final String subdir) {
+    private void installAssetToHomeDir(final Context context, final String assetName, final String subdir, final boolean overwrite) {
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 String output = "";
@@ -167,8 +178,8 @@ public class OpenTEEService extends Service {
 
                 File outFile = new File(destPath);
 
-                // If the file doesn't exist
-                if (!outFile.exists()) {
+                // If the file doesn't exist or if we don't care (overwrite mode)
+                if (!outFile.exists() || overwrite) {
                     // Copy and chmod the new file
                     try (InputStream inFile = context.getAssets().open(originAssetPath)) {
 
@@ -177,7 +188,9 @@ public class OpenTEEService extends Service {
                                 inFile,
                                 new FileOutputStream(outFile, false)); // we don't want to append, just (over)write
                         output = Utils.execUnixCommand("/system/bin/chmod 744 " + destPath);
-                        Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
+                        if (!output.isEmpty()) {
+                            Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
+                        }
                     } catch (IOException | InterruptedException e) {
                         Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
                         e.printStackTrace();
@@ -256,7 +269,9 @@ public class OpenTEEService extends Service {
                     String output = "";
                     String destPath = Utils.getFullFileDataPath(context) + File.separator + binaryName;
                     output = Utils.execUnixCommand(destPath);
-                    Log.d(OPEN_TEE_SERVICE_TAG, "Execution of binary returned: " + output);
+                    if (!output.isEmpty()) {
+                        Log.d(OPEN_TEE_SERVICE_TAG, "Execution of binary " + destPath + " returned: " + output);
+                    }
                 } catch (InterruptedException | IOException e) {
                     Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
                 }
