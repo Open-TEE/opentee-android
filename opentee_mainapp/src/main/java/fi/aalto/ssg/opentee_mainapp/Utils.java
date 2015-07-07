@@ -9,26 +9,44 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 /**
  * Created by code on 6/24/15.
  */
 public class Utils {
 
-    // Executes UNIX command.
-    public static String execUnixCommand(String command) throws IOException, InterruptedException {
-        Process process = Runtime.getRuntime().exec(command);
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream()));
-        int read;
-        char[] buffer = new char[4096];
-        StringBuffer output = new StringBuffer();
-        while ((read = reader.read(buffer)) > 0) {
-            output.append(buffer, 0, read);
+    /**
+     * Executes UNIX command.
+     * @param command command to execute + arguments in a string array (e.g. [/system/bin/ls, -l, -a, somedirectory] )
+     * @param environmentVars The environment variables to be passed upon execution
+     * @return A string containing the standard and error output.
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static String execUnixCommand(String[] command, Map<String, String> environmentVars) throws IOException, InterruptedException {
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+
+        if (environmentVars != null) {
+            Map<String, String> env = processBuilder.environment();
+            env.clear();
+            env.putAll(environmentVars);
         }
-        reader.close();
+        Process process = processBuilder.start();
+        String output = loadStream(process.getInputStream());
+        String error = loadStream(process.getErrorStream());
         process.waitFor();
-        return output.toString();
+        return output + "\n" + error;
+    }
+
+    private static String loadStream(InputStream s) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(s));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null)
+            sb.append(line).append("\n");
+        br.close();
+        return sb.toString();
     }
 
     public static void copyStream(Context context, InputStream in, FileOutputStream out) throws IOException {

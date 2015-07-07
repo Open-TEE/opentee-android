@@ -21,6 +21,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OpenTEEService extends Service {
 
@@ -30,7 +32,7 @@ public class OpenTEEService extends Service {
     public static final String OPENTEE_DIR_NAME = "opentee";
     public static final String OPENTEE_BIN_DIR = "bin";
     public static final String OPENTEE_TA_DIR = "ta";
-    public static final String OPENTEE_TEE_DIR ="tee";
+    public static final String OPENTEE_TEE_DIR = "tee";
 
     // These describe where the files are located in the assets/
     public static final String OPENTEE_ENGINE_ASSET_BIN_NAME = "opentee-engine";
@@ -89,7 +91,10 @@ public class OpenTEEService extends Service {
                     installConfigToHomeDir(mContext.get(), data.getString(MSG_CONF_NAME));
                     break;
                 case OpenTEEService.MSG_RUN_BIN:
-                    execBinaryFromHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME));
+                    // Setup the environment variable HOME to point to data home directory
+                    Map<String, String> environmentVars = new HashMap<>();
+                    environmentVars.put("HOME", Utils.getFullFileDataPath(mContext.get()));
+                    execBinaryFromHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME), environmentVars);
                     break;
                 case OpenTEEService.MSG_INSTALL_ALL:
                     installConfigToHomeDir(mContext.get(), OPENTEE_CONF_NAME);
@@ -128,23 +133,24 @@ public class OpenTEEService extends Service {
         Log.i(OPEN_TEE_SERVICE_TAG, "Service starting");
 
         // For each start request, send a message to start a job
-        // INSTALL ALL
-//        Message msg = mServiceHandler.obtainMessage(MSG_INSTALL_ALL );
-//        Bundle b = new Bundle();
-//        //b.putString(MSG_ASSET_NAME, OPENTEE_ENGINE_ASSET_BIN_NAME);
-//        b.putBoolean(MSG_OVERWRITE, true);
-//        msg.setData(b);
-//        mServiceHandler.sendMessage(msg);
-        // RUN OPENTEE
-        Message msg = mServiceHandler.obtainMessage(MSG_RUN_BIN );
-        Bundle b = new Bundle();
-        String dataHomeDir = Utils.getFullFileDataPath(getApplicationContext());
-        b.putString(MSG_ASSET_NAME, OPENTEE_BIN_DIR + File.separator + OPENTEE_ENGINE_ASSET_BIN_NAME + " -c "
-                + dataHomeDir + File.separator + OPENTEE_CONF_NAME
-                + " -p " + dataHomeDir);
-        msg.setData(b);
-        mServiceHandler.sendMessage(msg);
-
+        if (true) {
+            // INSTALL ALL
+            Message msg = mServiceHandler.obtainMessage(MSG_INSTALL_ALL);
+            Bundle b = new Bundle();
+            b.putBoolean(MSG_OVERWRITE, true);
+            msg.setData(b);
+            mServiceHandler.sendMessage(msg);
+        } else {
+            // RUN OPENTEE
+            Message msg = mServiceHandler.obtainMessage(MSG_RUN_BIN);
+            Bundle b = new Bundle();
+            String dataHomeDir = Utils.getFullFileDataPath(getApplicationContext());
+            b.putString(MSG_ASSET_NAME, OPENTEE_BIN_DIR + File.separator + OPENTEE_ENGINE_ASSET_BIN_NAME + " -c "
+                    + dataHomeDir + File.separator + OPENTEE_CONF_NAME
+                    + " -p " + dataHomeDir);
+            msg.setData(b);
+            mServiceHandler.sendMessage(msg);
+        }
         // If we get killed, after returning from here, restart
         return START_STICKY;
     }
@@ -187,7 +193,7 @@ public class OpenTEEService extends Service {
                         Utils.copyStream(context,
                                 inFile,
                                 new FileOutputStream(outFile, false)); // we don't want to append, just (over)write
-                        output = Utils.execUnixCommand("/system/bin/chmod 744 " + destPath);
+                        output = Utils.execUnixCommand(("/system/bin/chmod 744 " + destPath).split(" "), null);
                         if (!output.isEmpty()) {
                             Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
                         }
@@ -247,7 +253,7 @@ public class OpenTEEService extends Service {
                         } finally {
                             inReader.close();
                         }
-                        output = Utils.execUnixCommand("/system/bin/chmod 640 " + destPath);
+                        output = Utils.execUnixCommand(("/system/bin/chmod 640 " + destPath).split(" "), null);
                         Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
 
                     } catch (InterruptedException | IOException e) {
@@ -262,13 +268,13 @@ public class OpenTEEService extends Service {
         thread.start();
     }
 
-    private void execBinaryFromHomeDir(final Context context, final String binaryName) {
+    private void execBinaryFromHomeDir(final Context context, final String binaryName, final Map<String, String> environmentVars) {
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 try {
                     String output = "";
                     String destPath = Utils.getFullFileDataPath(context) + File.separator + binaryName;
-                    output = Utils.execUnixCommand(destPath);
+                    output = Utils.execUnixCommand(destPath.split(" "), environmentVars);
                     if (!output.isEmpty()) {
                         Log.d(OPEN_TEE_SERVICE_TAG, "Execution of binary " + destPath + " returned: " + output);
                     }
