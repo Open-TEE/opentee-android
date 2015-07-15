@@ -94,6 +94,8 @@ public class OpenTEEService extends Service {
                     // Setup the environment variable HOME to point to data home directory
                     Map<String, String> environmentVars = new HashMap<>();
                     environmentVars.put("HOME", Utils.getFullFileDataPath(mContext.get()));
+                    environmentVars.put("LD_LIBRARY_PATH", mContext.get().getApplicationInfo().dataDir + File.separator + "lib");
+                    Log.i(OPEN_TEE_SERVICE_TAG, "LD_PATH: " + mContext.get().getApplicationInfo().dataDir + File.separator + "lib");
                     execBinaryFromHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME), environmentVars);
                     break;
                 case OpenTEEService.MSG_INSTALL_ALL:
@@ -133,7 +135,7 @@ public class OpenTEEService extends Service {
         Log.i(OPEN_TEE_SERVICE_TAG, "Service starting");
 
         // For each start request, send a message to start a job
-        if (true) {
+        if (false) {
             // INSTALL ALL
             Message msg = mServiceHandler.obtainMessage(MSG_INSTALL_ALL);
             Bundle b = new Bundle();

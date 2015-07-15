@@ -16,6 +16,8 @@ import java.util.Map;
  */
 public class Utils {
 
+    public static final String UTILS_TAG = "Utils";
+
     /**
      * Executes UNIX command.
      * @param command command to execute + arguments in a string array (e.g. [/system/bin/ls, -l, -a, somedirectory] )
@@ -65,7 +67,11 @@ public class Utils {
         if (!dataPath.isDirectory()) {
             try {
                 dataPath.mkdirs();
-            } catch (SecurityException e) {
+                String output = execUnixCommand(("/system/bin/chmod 755 " + dataPath).split(" "), null);
+                if (!output.isEmpty()) {
+                    Log.d(UTILS_TAG, "Chmod returned: " + output);
+                }
+            } catch (SecurityException | InterruptedException | IOException e) {
                 Log.e(OpenTEEService.OPEN_TEE_SERVICE_TAG, e.getMessage());
                 e.printStackTrace();
             }
