@@ -82,13 +82,8 @@ public class OpenTEEService extends Service {
 
         @Override
         public void handleMessage(Message msg) {
-            // Normally we would do some work here, like download a file.
-            // For our sample, we just sleep for 5 seconds.
-            Log.i(OPEN_TEE_SERVICE_TAG, "CPU ABI " + Arrays.toString(Build.SUPPORTED_ABIS));
+            Log.d(OPEN_TEE_SERVICE_TAG, "CPU ABI " + Arrays.toString(Build.SUPPORTED_ABIS));
 
-            // Stop the service using the startId, so that we don't stop
-            // the service in the middle of handling another job
-            //stopSelf(msg.arg1);
             Bundle data = msg.getData();
             switch (msg.what) {
                 case OpenTEEService.MSG_INSTALL_ASSET:
@@ -139,7 +134,6 @@ public class OpenTEEService extends Service {
             }
         }
 
-
     }
 
     @Override
@@ -158,8 +152,6 @@ public class OpenTEEService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(OPEN_TEE_SERVICE_TAG, "Service starting");
-
         // TEST: set selinux to permissive
         //mServiceHandler.sendMessage(mServiceHandler.obtainMessage(MSG_SELINUX_TO_PERMISSIVE));
 
@@ -186,6 +178,7 @@ public class OpenTEEService extends Service {
             mServiceHandler.sendMessage(msg);
         }
 
+        Log.i(OPEN_TEE_SERVICE_TAG, "OpenTEEService started");
         // If we get killed, after returning from here, restart
         return START_STICKY;
     }
@@ -198,58 +191,53 @@ public class OpenTEEService extends Service {
 
     @Override
     public void onDestroy() {
-
         try {
-            if (executor != null) {
-                if (executor.awaitTermination(10, TimeUnit.SECONDS)) {
-                    System.out.println("task completed");
-                } else {
-                    System.out.println("Forcing shutdown...");
-                    executor.shutdownNow();
-                }
+            if (executor != null && !executor.awaitTermination(10, TimeUnit.SECONDS)) {
+                Log.d(OPEN_TEE_SERVICE_TAG, "Forcing shutdown...");
+                executor.shutdownNow();
             }
         } catch (InterruptedException e) {
             Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
         }
-        Log.i(OPEN_TEE_SERVICE_TAG, "Service stopped");
+        Log.i(OPEN_TEE_SERVICE_TAG, "OpenTEEService stopped");
     }
 
     private void installAssetToHomeDir(final Context context, final String assetName, final String destSubdir, final boolean overwrite) {
         if (executor != null)
             executor.submit(new Runnable() {
-            public void run() {
-                // Asset folder containing the binary based on the first
-                // supported CPU architecture (ABI) (i.e. armeabi, armeabi-v7a, x86)
-                String originAssetPath = Build.SUPPORTED_ABIS[0] + File.separator + assetName;
-                Log.d(OPEN_TEE_SERVICE_TAG, "Copying from: " + originAssetPath);
-                try (InputStream inFile = context.getAssets().open(originAssetPath)) {
-                    installFileToHomedir(context, inFile, destSubdir, assetName, overwrite);
-                } catch (IOException | InterruptedException e) {
-                    Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
-                    e.printStackTrace();
+                public void run() {
+                    // Asset folder containing the binary based on the first
+                    // supported CPU architecture (ABI) (i.e. armeabi, armeabi-v7a, x86)
+                    String originAssetPath = Build.SUPPORTED_ABIS[0] + File.separator + assetName;
+                    Log.d(OPEN_TEE_SERVICE_TAG, "Copying from: " + originAssetPath);
+                    try (InputStream inFile = context.getAssets().open(originAssetPath)) {
+                        installStreamToHomedir(context, inFile, destSubdir, assetName, overwrite);
+                    } catch (IOException | InterruptedException e) {
+                        Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
     }
 
     private void installFileToHomeDir(final Context context, final String filePath, final String destSubdir, final boolean overwrite) {
         if (executor != null)
             executor.submit(new Runnable() {
-            public void run() {
-                Log.d(OPEN_TEE_SERVICE_TAG, "Copying from: " + filePath);
-                try (InputStream inFile = new FileInputStream(filePath)) {
-                    // last string after File.separator is our file's name
-                    String fileName = filePath.substring(filePath.lastIndexOf(File.pathSeparatorChar));
-                    installFileToHomedir(context, inFile, destSubdir, fileName, overwrite);
-                } catch (IOException | InterruptedException e) {
-                    Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
-                    e.printStackTrace();
+                public void run() {
+                    Log.d(OPEN_TEE_SERVICE_TAG, "Copying from: " + filePath);
+                    try (InputStream inFile = new FileInputStream(filePath)) {
+                        // last string after File.separator is our file's name
+                        String fileName = filePath.substring(filePath.lastIndexOf(File.pathSeparatorChar));
+                        installStreamToHomedir(context, inFile, destSubdir, fileName, overwrite);
+                    } catch (IOException | InterruptedException e) {
+                        Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
     }
 
-    private void installFileToHomedir(Context context, InputStream inFile, String destSubdir, String assetName, boolean overwrite) throws IOException, InterruptedException {
+    private void installStreamToHomedir(Context context, InputStream inFile, String destSubdir, String assetName, boolean overwrite) throws IOException, InterruptedException {
         String destPath = Utils.getFullFileDataPath(context);
         // if you have to install in a subdir, check and create it if necessary
         if (destSubdir != null) {
@@ -287,53 +275,53 @@ public class OpenTEEService extends Service {
     private void installConfigToHomeDir(final Context context, final String confFileName) {
         if (executor != null)
             executor.submit(new Runnable() {
-            public void run() {
-                String output = "";
-                String destPath = Utils.getFullFileDataPath(context) + File.separator + confFileName;
+                public void run() {
+                    String output = "";
+                    String destPath = Utils.getFullFileDataPath(context) + File.separator + confFileName;
 
-                // Asset folder containing the binary based on the first
-                // supported CPU architecture (ABI) (i.e. armeabi, armeabi-v7a, x86)
-                Log.d(OPEN_TEE_SERVICE_TAG, "App Data home Dir: " + destPath);
+                    // Asset folder containing the binary based on the first
+                    // supported CPU architecture (ABI) (i.e. armeabi, armeabi-v7a, x86)
+                    Log.d(OPEN_TEE_SERVICE_TAG, "App Data home Dir: " + destPath);
 
-                File outConfFile = new File(destPath);
+                    File outConfFile = new File(destPath);
 
-                // If the file doesn't exist
-                if (!outConfFile.exists()) {
-                    try (BufferedReader inReader =
-                                 new BufferedReader(
-                                         new InputStreamReader(
-                                                 context.getAssets().open(confFileName)
-                                                 , "UTF-8"))) {
-                        // Copy and chmod the new file
-                        Log.d(OPEN_TEE_SERVICE_TAG, "Copying " + destPath + " TO " + destPath);
+                    // If the file doesn't exist
+                    if (!outConfFile.exists()) {
+                        try (BufferedReader inReader =
+                                     new BufferedReader(
+                                             new InputStreamReader(
+                                                     context.getAssets().open(confFileName)
+                                                     , "UTF-8"))) {
+                            // Copy and chmod the new file
+                            Log.d(OPEN_TEE_SERVICE_TAG, "Copying " + destPath + " TO " + destPath);
 
-                        try (PrintWriter outWriter = new PrintWriter(outConfFile, "UTF-8")) {
+                            try (PrintWriter outWriter = new PrintWriter(outConfFile, "UTF-8")) {
 
-                            String line = null;
-                            while ((line = inReader.readLine()) != null) {
-                                line = line.replaceAll("\\b" + Constants.OPENTEE_DIR_CONF_PLACEHOLDER + "\\b", Utils.getFullFileDataPath(context));
-                                System.out.println(line);
-                                outWriter.println(line);
+                                String line = null;
+                                while ((line = inReader.readLine()) != null) {
+                                    line = line.replaceAll("\\b" + Constants.OPENTEE_DIR_CONF_PLACEHOLDER + "\\b", Utils.getFullFileDataPath(context));
+                                    System.out.println(line);
+                                    outWriter.println(line);
+                                }
+
+                            } catch (IOException e) {
+                                Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                                e.printStackTrace();
+                            } finally {
+                                inReader.close();
                             }
+                            output = Utils.execUnixCommand(("/system/bin/chmod 640 " + destPath).split(" "), null);
+                            Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
 
-                        } catch (IOException e) {
+                        } catch (InterruptedException | IOException e) {
                             Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
                             e.printStackTrace();
-                        } finally {
-                            inReader.close();
                         }
-                        output = Utils.execUnixCommand(("/system/bin/chmod 640 " + destPath).split(" "), null);
-                        Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
-
-                    } catch (InterruptedException | IOException e) {
-                        Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
-                        e.printStackTrace();
                     }
+
+
                 }
-
-
-            }
-        });
+            });
     }
 
     private void execBinaryFromHomeDir(final Context context, final String binaryName, final Map<String, String> environmentVars) {
@@ -366,23 +354,23 @@ public class OpenTEEService extends Service {
     private void setSELinuxToPermissive(final Context context) {
         if (executor != null)
             executor.submit(new Runnable() {
-            public void run() {
-                try {
-                    if (RootShell.isAccessGiven()) {
-                        Command command = new Command(0, "/system/bin/setenforce 0", "/system/bin/chmod 777 /data/local/tmp/");
-                        try {
-                            RootShell.getShell(true).add(command);
-                        } catch (TimeoutException e) {
-                            e.printStackTrace();
-                        } catch (RootDeniedException e) {
-                            e.printStackTrace();
+                public void run() {
+                    try {
+                        if (RootShell.isAccessGiven()) {
+                            Command command = new Command(0, "/system/bin/setenforce 0", "/system/bin/chmod 777 /data/local/tmp/");
+                            try {
+                                RootShell.getShell(true).add(command);
+                            } catch (TimeoutException e) {
+                                Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                            } catch (RootDeniedException e) {
+                                Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                            }
                         }
+                    } catch (IOException e) {
+                        Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
                     }
-                } catch (IOException e) {
-                    Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
                 }
-            }
-        });
+            });
     }
 
     public void startOpenTEEEngine(Context context) {
@@ -400,43 +388,43 @@ public class OpenTEEService extends Service {
     private void stopOpenTEEEngine(final Context context) {
         if (executor != null)
             executor.submit(new Runnable() {
-            public void run() {
-                try {
-                    // Find PID of opentee-engine
-                    String command = "/system/bin/ps | /system/bin/grep tee_manager";
-                    String output = Utils.execUnixCommand(command.split(" "), null);
-                    if (!output.isEmpty()) {
-                        String[] lines = output.split("\n");
-                        for (int i = 1; i < lines.length; i++) { // avoid first line with headers
-                            // Process found
-                            String pid = lines[i].trim().replaceAll("[ ]+", " ").split(" ")[1]; // take the second column (pid)
-                            Log.d(OPEN_TEE_SERVICE_TAG, "OpenTEE PID is " + pid + ". Trying to kill...");
-                            if (!pid.isEmpty()) {
-                                try {
-                                    android.os.Process.killProcess(Integer.parseInt(pid));
-                                } catch (NumberFormatException e) {
-                                    Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                public void run() {
+                    try {
+                        // Find PID of opentee-engine
+                        String command = "/system/bin/ps | /system/bin/grep tee_manager";
+                        String output = Utils.execUnixCommand(command.split(" "), null);
+                        if (!output.isEmpty()) {
+                            String[] lines = output.split("\n");
+                            for (int i = 1; i < lines.length; i++) { // avoid first line with headers
+                                // Process found, trim output of ps and clean up extra spaces in it to find pid
+                                String pid = lines[i].trim().replaceAll("[ ]+", " ").split(" ")[1]; // take the second column (pid)
+                                Log.d(OPEN_TEE_SERVICE_TAG, "OpenTEE PID is " + pid + ". Trying to kill...");
+                                if (!pid.isEmpty()) {
+                                    try {
+                                        android.os.Process.killProcess(Integer.parseInt(pid));
+                                    } catch (NumberFormatException e) {
+                                        Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                                    }
                                 }
                             }
+                            Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);
                         }
-                        Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);
+                        // Delete socket file
+                        command = "/system/bin/rm " + Constants.OPENTEE_SOCKET_PATH;
+                        output = Utils.execUnixCommand(command.split(" "), null);
+                        if (!output.isEmpty()) {
+                            Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);
+                        }
+                        // Delete pid file
+                        command = "/system/bin/rm " + Utils.getFullFileDataPath(context) + File.separator + Constants.OPENTEE_PID_FILENAME;
+                        output = Utils.execUnixCommand(command.split(" "), null);
+                        if (!output.isEmpty()) {
+                            Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);
+                        }
+                    } catch (InterruptedException | IOException e) {
+                        Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
                     }
-                    // Delete socket file
-                    command = "/system/bin/rm " + Constants.OPENTEE_SOCKET_PATH;
-                    output = Utils.execUnixCommand(command.split(" "), null);
-                    if (!output.isEmpty()) {
-                        Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);
-                    }
-                    // Delete pid file
-                    command = "/system/bin/rm " + Utils.getFullFileDataPath(context) + File.separator + Constants.OPENTEE_PID_FILENAME;
-                    output = Utils.execUnixCommand(command.split(" "), null);
-                    if (!output.isEmpty()) {
-                        Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);
-                    }
-                } catch (InterruptedException | IOException e) {
-                    Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
                 }
-            }
-        });
+            });
     }
 }
