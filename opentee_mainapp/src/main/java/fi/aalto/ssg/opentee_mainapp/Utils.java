@@ -42,9 +42,9 @@ public class Utils {
     public static String execUnixCommand(String[] command, Map<String, String> environmentVars) throws IOException, InterruptedException {
         ProcessBuilder processBuilder = new ProcessBuilder(command);
 
+        Map<String, String> env = processBuilder.environment();
+        env.clear();
         if (environmentVars != null) {
-            Map<String, String> env = processBuilder.environment();
-            env.clear();
             env.putAll(environmentVars);
         }
         Process process = processBuilder.start();

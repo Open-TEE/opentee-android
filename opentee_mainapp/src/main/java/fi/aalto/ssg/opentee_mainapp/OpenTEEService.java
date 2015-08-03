@@ -25,6 +25,10 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.stericson.RootShell.RootShell;
+import com.stericson.RootShell.exceptions.RootDeniedException;
+import com.stericson.RootShell.execution.Command;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,6 +41,7 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 public class OpenTEEService extends Service {
 
@@ -47,8 +52,11 @@ public class OpenTEEService extends Service {
     private static final int MSG_INSTALL_CONF = 2;
     private static final int MSG_INSTALL_ALL = 3;
     private static final int MSG_RUN_BIN = 4;
+    private static final int MSG_SELINUX_TO_PERMISSIVE = 5;
+    private static final int MSG_INSTALL_FILE = 6;
     private static final String MSG_ASSET_NAME = "MSG_ASSET_NAME";
-    private static final String MSG_ASSET_SUBDIR = "MSG_ASSET_SUBDIR";
+    private static final String MSG_FILE_NAME = "MSG_FILE_NAME";
+    private static final String MSG_DEST_SUBDIR = "MSG_DEST_SUBDIR";
     private static final String MSG_CONF_NAME = "MSG_CONF_NAME";
     private static final String MSG_OVERWRITE = "MSG_OVERWRITE";
 
@@ -77,10 +85,16 @@ public class OpenTEEService extends Service {
             Bundle data = msg.getData();
             switch (msg.what) {
                 case OpenTEEService.MSG_INSTALL_ASSET:
-                    installAssetToHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME), data.getString(MSG_ASSET_SUBDIR), data.getBoolean(MSG_OVERWRITE));
+                    installAssetToHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME), data.getString(MSG_DEST_SUBDIR), data.getBoolean(MSG_OVERWRITE));
                     break;
                 case OpenTEEService.MSG_INSTALL_CONF:
                     installConfigToHomeDir(mContext.get(), data.getString(MSG_CONF_NAME));
+                    break;
+                case OpenTEEService.MSG_SELINUX_TO_PERMISSIVE:
+                    setSELinuxToPermissive(mContext.get());
+                    break;
+                case OpenTEEService.MSG_INSTALL_FILE:
+                    installFileToHomeDir(mContext.get(), data.getString(MSG_FILE_NAME), data.getString(MSG_DEST_SUBDIR), data.getBoolean(MSG_OVERWRITE));
                     break;
                 case OpenTEEService.MSG_RUN_BIN:
                     // Setup the environment variable HOME to point to data home directory
@@ -126,6 +140,9 @@ public class OpenTEEService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(OPEN_TEE_SERVICE_TAG, "Service starting");
 
+        // TEST: set selinux to permissive
+        //mServiceHandler.sendMessage(mServiceHandler.obtainMessage(MSG_SELINUX_TO_PERMISSIVE));
+
         // For each start request, send a message to start a job
         if (true) {
             // INSTALL ALL
@@ -145,6 +162,7 @@ public class OpenTEEService extends Service {
             msg.setData(b);
             mServiceHandler.sendMessage(msg);
         }
+
         // If we get killed, after returning from here, restart
         return START_STICKY;
     }
@@ -159,7 +177,7 @@ public class OpenTEEService extends Service {
     public void onDestroy() {
         Log.i(OPEN_TEE_SERVICE_TAG, "Service stopped");
     }
-    
+
     private void installAssetToHomeDir(final Context context, final String assetName, final String destSubdir, final boolean overwrite) {
         Thread thread = new Thread(new Runnable() {
             public void run() {
@@ -195,7 +213,7 @@ public class OpenTEEService extends Service {
         thread.start();
     }
 
-    public void installFileToHomedir(Context context, InputStream inFile, String destSubdir, String assetName, boolean overwrite) throws IOException, InterruptedException {
+    private void installFileToHomedir(Context context, InputStream inFile, String destSubdir, String assetName, boolean overwrite) throws IOException, InterruptedException {
         String destPath = Utils.getFullFileDataPath(context);
         // if you have to install in a subdir, check and create it if necessary
         if (destSubdir != null) {
@@ -286,13 +304,39 @@ public class OpenTEEService extends Service {
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 try {
-                    String output = "";
                     String destPath = Utils.getFullFileDataPath(context) + File.separator + binaryName;
-                    output = Utils.execUnixCommand(destPath.split(" "), environmentVars);
+                    String output = Utils.execUnixCommand(destPath.split(" "), environmentVars);
                     if (!output.isEmpty()) {
                         Log.d(OPEN_TEE_SERVICE_TAG, "Execution of binary " + destPath + " returned: " + output);
                     }
                 } catch (InterruptedException | IOException e) {
+                    Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                }
+            }
+        });
+        thread.start();
+    }
+
+    /**
+     * Requires root permissions. Needs SuperSu to work. Alternatively just
+     * run "su -c setenforce 0" through adb root.
+     * @param context
+     */
+    private void setSELinuxToPermissive(final Context context) {
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    if (RootShell.isAccessGiven()) {
+                        Command command = new Command(0, "/system/bin/setenforce 0");
+                        try {
+                            RootShell.getShell(true).add(command);
+                        } catch (TimeoutException e) {
+                            e.printStackTrace();
+                        } catch (RootDeniedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (IOException e) {
                     Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
                 }
             }
