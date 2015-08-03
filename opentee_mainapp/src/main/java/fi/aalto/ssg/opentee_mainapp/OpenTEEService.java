@@ -27,6 +27,7 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -126,7 +127,7 @@ public class OpenTEEService extends Service {
         Log.i(OPEN_TEE_SERVICE_TAG, "Service starting");
 
         // For each start request, send a message to start a job
-        if (false) {
+        if (true) {
             // INSTALL ALL
             Message msg = mServiceHandler.obtainMessage(MSG_INSTALL_ALL);
             Bundle b = new Bundle();
@@ -158,47 +159,67 @@ public class OpenTEEService extends Service {
     public void onDestroy() {
         Log.i(OPEN_TEE_SERVICE_TAG, "Service stopped");
     }
-
-    private void installAssetToHomeDir(final Context context, final String assetName, final String subdir, final boolean overwrite) {
+    
+    private void installAssetToHomeDir(final Context context, final String assetName, final String destSubdir, final boolean overwrite) {
         Thread thread = new Thread(new Runnable() {
             public void run() {
-                String output = "";
-                String destPath = Utils.getFullFileDataPath(context);
-                // if you have to install in a subdir, check and create it if necessary
-                if (subdir != null) {
-                    destPath += File.separator + subdir;
-                    Utils.checkAndCreateDir(destPath);
-                }
-                destPath += File.separator + assetName;
                 // Asset folder containing the binary based on the first
                 // supported CPU architecture (ABI) (i.e. armeabi, armeabi-v7a, x86)
                 String originAssetPath = Build.SUPPORTED_ABIS[0] + File.separator + assetName;
-                Log.d(OPEN_TEE_SERVICE_TAG, "App Data home Dir: " + destPath);
-
-                File outFile = new File(destPath);
-
-                // If the file doesn't exist or if we don't care (overwrite mode)
-                if (!outFile.exists() || overwrite) {
-                    // Copy and chmod the new file
-                    try (InputStream inFile = context.getAssets().open(originAssetPath)) {
-
-                        Log.d(OPEN_TEE_SERVICE_TAG, "Copying " + originAssetPath + " TO " + destPath);
-                        Utils.copyStream(context,
-                                inFile,
-                                new FileOutputStream(outFile, false)); // we don't want to append, just (over)write
-                        output = Utils.execUnixCommand(("/system/bin/chmod 744 " + destPath).split(" "), null);
-                        if (!output.isEmpty()) {
-                            Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
-                        }
-                    } catch (IOException | InterruptedException e) {
-                        Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
-                        e.printStackTrace();
-                    }
+                Log.d(OPEN_TEE_SERVICE_TAG, "Copying from: " + originAssetPath);
+                try (InputStream inFile = context.getAssets().open(originAssetPath)) {
+                    installFileToHomedir(context, inFile, destSubdir, assetName, overwrite);
+                } catch (IOException | InterruptedException e) {
+                    Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                    e.printStackTrace();
                 }
-
             }
         });
         thread.start();
+    }
+
+    private void installFileToHomeDir(final Context context, final String filePath, final String destSubdir, final boolean overwrite) {
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                Log.d(OPEN_TEE_SERVICE_TAG, "Copying from: " + filePath);
+                try (InputStream inFile = new FileInputStream(filePath)) {
+                    // last string after File.separator is our file's name
+                    String fileName = filePath.substring(filePath.lastIndexOf(File.pathSeparatorChar));
+                    installFileToHomedir(context, inFile, destSubdir, fileName, overwrite);
+                } catch (IOException | InterruptedException e) {
+                    Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+    }
+
+    public void installFileToHomedir(Context context, InputStream inFile, String destSubdir, String assetName, boolean overwrite) throws IOException, InterruptedException {
+        String destPath = Utils.getFullFileDataPath(context);
+        // if you have to install in a subdir, check and create it if necessary
+        if (destSubdir != null) {
+            destPath += File.separator + destSubdir;
+            Utils.checkAndCreateDir(destPath);
+        }
+        destPath += File.separator + assetName;
+        Log.d(OPEN_TEE_SERVICE_TAG, "App Data home Dir: " + destPath);
+
+        File outFile = new File(destPath);
+
+        // If the file doesn't exist or if we don't care (overwrite mode)
+        if (!outFile.exists() || overwrite) {
+            // Copy and chmod the new file
+            Log.d(OPEN_TEE_SERVICE_TAG, "Copying to: " + destPath);
+            Utils.copyStream(context,
+                    inFile,
+                    new FileOutputStream(outFile, false)); // we don't want to append, just (over)write
+            String output = Utils.execUnixCommand(("/system/bin/chmod 744 " + destPath).split(" "), null);
+            if (!output.isEmpty()) {
+                Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
+            }
+
+        }
     }
 
     /**
