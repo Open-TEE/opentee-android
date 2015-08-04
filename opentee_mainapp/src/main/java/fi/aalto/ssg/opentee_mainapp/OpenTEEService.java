@@ -156,26 +156,6 @@ public class OpenTEEService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // For each start request, send a message to start a job
-        /*if (false) {
-            // INSTALL ALL
-            Message msg = mServiceHandler.obtainMessage(MSG_INSTALL_ALL);
-            Bundle b = new Bundle();
-            b.putBoolean(MSG_OVERWRITE, true);
-            msg.setData(b);
-            mServiceHandler.sendMessage(msg);
-        } else {
-            // RUN OPENTEE
-            Message msg = mServiceHandler.obtainMessage(MSG_RUN_BIN);
-            Bundle b = new Bundle();
-            String dataHomeDir = Utils.getFullFileDataPath(getApplicationContext());
-            b.putString(MSG_ASSET_NAME, Constants.OPENTEE_BIN_DIR + File.separator + Constants.OPENTEE_ENGINE_ASSET_BIN_NAME + " -c "
-                    + dataHomeDir + File.separator + Constants.OPENTEE_CONF_NAME
-                    + " -p " + dataHomeDir);
-            msg.setData(b);
-            mServiceHandler.sendMessage(msg);
-        }*/
-
         Log.i(OPEN_TEE_SERVICE_TAG, "OpenTEEService started");
         // If we get killed, after returning from here, restart
         return START_STICKY;
