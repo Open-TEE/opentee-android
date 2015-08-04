@@ -23,6 +23,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Messenger;
 import android.util.Log;
 
 import com.stericson.RootShell.RootShell;
@@ -68,7 +69,9 @@ public class OpenTEEService extends Service {
 
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
-    private ExecutorService executor;
+    private ExecutorService mExecutor;
+    private Messenger mMessenger;
+
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
@@ -138,7 +141,7 @@ public class OpenTEEService extends Service {
 
     @Override
     public void onCreate() {
-        executor = Executors.newSingleThreadExecutor();
+        mExecutor = Executors.newSingleThreadExecutor();
         // Start up the thread running the service.  Note that we create a
         // separate thread because the service normally runs in the process's
         // main thread, which we don't want to block.
@@ -148,18 +151,13 @@ public class OpenTEEService extends Service {
         // Get the HandlerThread's Looper and use it for our Handler
         mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler(getApplicationContext(), mServiceLooper);
+        mMessenger = new Messenger(mServiceHandler);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // TEST: set selinux to permissive
-        //mServiceHandler.sendMessage(mServiceHandler.obtainMessage(MSG_SELINUX_TO_PERMISSIVE));
-
-        // TEST: kill opentee engine if it was previously running
-        mServiceHandler.sendMessage(mServiceHandler.obtainMessage(MSG_STOP_OPENTEE_ENGINE));
-
         // For each start request, send a message to start a job
-        if (false) {
+        /*if (false) {
             // INSTALL ALL
             Message msg = mServiceHandler.obtainMessage(MSG_INSTALL_ALL);
             Bundle b = new Bundle();
@@ -176,7 +174,7 @@ public class OpenTEEService extends Service {
                     + " -p " + dataHomeDir);
             msg.setData(b);
             mServiceHandler.sendMessage(msg);
-        }
+        }*/
 
         Log.i(OPEN_TEE_SERVICE_TAG, "OpenTEEService started");
         // If we get killed, after returning from here, restart
@@ -185,16 +183,15 @@ public class OpenTEEService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        // We don't provide binding, so return null
-        return null;
+        return mMessenger.getBinder();
     }
 
     @Override
     public void onDestroy() {
         try {
-            if (executor != null && !executor.awaitTermination(10, TimeUnit.SECONDS)) {
+            if (mExecutor != null && !mExecutor.awaitTermination(10, TimeUnit.SECONDS)) {
                 Log.d(OPEN_TEE_SERVICE_TAG, "Forcing shutdown...");
-                executor.shutdownNow();
+                mExecutor.shutdownNow();
             }
         } catch (InterruptedException e) {
             Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
@@ -203,8 +200,8 @@ public class OpenTEEService extends Service {
     }
 
     private void installAssetToHomeDir(final Context context, final String assetName, final String destSubdir, final boolean overwrite) {
-        if (executor != null)
-            executor.submit(new Runnable() {
+        if (mExecutor != null)
+            mExecutor.submit(new Runnable() {
                 public void run() {
                     // Asset folder containing the binary based on the first
                     // supported CPU architecture (ABI) (i.e. armeabi, armeabi-v7a, x86)
@@ -221,8 +218,8 @@ public class OpenTEEService extends Service {
     }
 
     private void installFileToHomeDir(final Context context, final String filePath, final String destSubdir, final boolean overwrite) {
-        if (executor != null)
-            executor.submit(new Runnable() {
+        if (mExecutor != null)
+            mExecutor.submit(new Runnable() {
                 public void run() {
                     Log.d(OPEN_TEE_SERVICE_TAG, "Copying from: " + filePath);
                     try (InputStream inFile = new FileInputStream(filePath)) {
@@ -273,8 +270,8 @@ public class OpenTEEService extends Service {
      * @param confFileName
      */
     private void installConfigToHomeDir(final Context context, final String confFileName) {
-        if (executor != null)
-            executor.submit(new Runnable() {
+        if (mExecutor != null)
+            mExecutor.submit(new Runnable() {
                 public void run() {
                     String output = "";
                     String destPath = Utils.getFullFileDataPath(context) + File.separator + confFileName;
@@ -325,8 +322,8 @@ public class OpenTEEService extends Service {
     }
 
     private void execBinaryFromHomeDir(final Context context, final String binaryName, final Map<String, String> environmentVars) {
-        if (executor != null)
-            executor.submit(new Runnable() {
+        if (mExecutor != null)
+            mExecutor.submit(new Runnable() {
                 public void run() {
                     try {
                         String destPath = Utils.getFullFileDataPath(context) + File.separator + binaryName;
@@ -352,8 +349,8 @@ public class OpenTEEService extends Service {
      * @param context
      */
     private void setSELinuxToPermissive(final Context context) {
-        if (executor != null)
-            executor.submit(new Runnable() {
+        if (mExecutor != null)
+            mExecutor.submit(new Runnable() {
                 public void run() {
                     try {
                         if (RootShell.isAccessGiven()) {
@@ -373,7 +370,7 @@ public class OpenTEEService extends Service {
             });
     }
 
-    public void startOpenTEEEngine(Context context) {
+    private void startOpenTEEEngine(Context context) {
         String dataHomeDir = Utils.getFullFileDataPath(context);
         String command = Constants.OPENTEE_BIN_DIR + File.separator + Constants.OPENTEE_ENGINE_ASSET_BIN_NAME + " -c "
                 + dataHomeDir + File.separator + Constants.OPENTEE_CONF_NAME
@@ -386,8 +383,8 @@ public class OpenTEEService extends Service {
     }
 
     private void stopOpenTEEEngine(final Context context) {
-        if (executor != null)
-            executor.submit(new Runnable() {
+        if (mExecutor != null)
+            mExecutor.submit(new Runnable() {
                 public void run() {
                     try {
                         // Find PID of opentee-engine
