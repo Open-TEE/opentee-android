@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * Created by code on 6/24/15.
@@ -33,7 +34,8 @@ public class Utils {
 
     /**
      * Executes UNIX command.
-     * @param command command to execute + arguments in a string array (e.g. [/system/bin/ls, -l, -a, somedirectory] )
+     *
+     * @param command         command to execute + arguments in a string array (e.g. [/system/bin/ls, -l, -a, somedirectory] )
      * @param environmentVars The environment variables to be passed upon execution
      * @return A string containing the standard and error output.
      * @throws IOException
@@ -95,5 +97,22 @@ public class Utils {
     public static String getFullFileDataPath(Context context) {
         File dataPath = checkAndCreateDir(context.getApplicationInfo().dataDir + File.separator + Constants.OPENTEE_DIR_NAME);
         return dataPath.getAbsolutePath();
+    }
+
+    public static String readFileToString(String fileName) throws IOException {
+
+        File file = new File(fileName);
+        StringBuilder fileContents = new StringBuilder((int) file.length());
+        Scanner scanner = new Scanner(file, "UTF-8");
+        String lineSeparator = System.getProperty("line.separator");
+
+        try {
+            while (scanner.hasNextLine()) {
+                fileContents.append(scanner.nextLine() + lineSeparator);
+            }
+            return fileContents.toString();
+        } finally {
+            scanner.close();
+        }
     }
 }

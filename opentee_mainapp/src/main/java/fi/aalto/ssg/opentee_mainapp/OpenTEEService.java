@@ -367,28 +367,30 @@ public class OpenTEEService extends Service {
             mExecutor.submit(new Runnable() {
                 public void run() {
                     try {
-                        // Find PID of opentee-engine
-                        String command = "/system/bin/ps | /system/bin/grep tee_manager";
-                        String output = Utils.execUnixCommand(command.split(" "), null);
-                        if (!output.isEmpty()) {
-                            String[] lines = output.split("\n");
-                            for (int i = 1; i < lines.length; i++) { // avoid first line with headers
-                                // Process found, trim output of ps and clean up extra spaces in it to find pid
-                                String pid = lines[i].trim().replaceAll("[ ]+", " ").split(" ")[1]; // take the second column (pid)
-                                Log.d(OPEN_TEE_SERVICE_TAG, "OpenTEE PID is " + pid + ". Trying to kill...");
-                                if (!pid.isEmpty()) {
-                                    try {
-                                        android.os.Process.killProcess(Integer.parseInt(pid));
-                                    } catch (NumberFormatException e) {
-                                        Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
-                                    }
+                        // Find PID of opentee-engine by reading pid file
+                        String pid = null;
+                        try {
+                            pid = Utils.readFileToString(
+                                    Utils.getFullFileDataPath(context)
+                                            + File.separator
+                                            + Constants.OPENTEE_PID_FILENAME);
+                        } catch (IOException e) {
+                            Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                        }
+                        if (pid != null) {
+                            pid = pid.trim();
+                            Log.d(OPEN_TEE_SERVICE_TAG, "OpenTEE PID is " + pid + ". Trying to kill...");
+                            if (!pid.isEmpty()) {
+                                try {
+                                    android.os.Process.killProcess(Integer.parseInt(pid));
+                                } catch (NumberFormatException e) {
+                                    Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
                                 }
                             }
-                            Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);
                         }
                         // Delete socket file
-                        command = "/system/bin/rm " + Constants.OPENTEE_SOCKET_PATH;
-                        output = Utils.execUnixCommand(command.split(" "), null);
+                        String command = "/system/bin/rm " + Constants.OPENTEE_SOCKET_PATH;
+                        String output = Utils.execUnixCommand(command.split(" "), null);
                         if (!output.isEmpty()) {
                             Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);
                         }
