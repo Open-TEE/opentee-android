@@ -114,7 +114,6 @@ public class OpenTEEService extends Service {
                 case OpenTEEService.MSG_RUN_BIN:
                     // Setup the environment variable HOME to point to data home directory
                     Map<String, String> environmentVars = new HashMap<>();
-                    environmentVars.put("HOME", Utils.getFullFileDataPath(mContext.get()));
                     environmentVars.put("LD_LIBRARY_PATH", mContext.get().getApplicationInfo().dataDir + File.separator + "lib");
                     Log.d(OPEN_TEE_SERVICE_TAG, "LD_LIBRARY_PATH: " + mContext.get().getApplicationInfo().dataDir + File.separator + "lib");
                     execBinaryFromHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME), environmentVars);
@@ -356,7 +355,8 @@ public class OpenTEEService extends Service {
                 + dataHomeDir + File.separator + Constants.OPENTEE_CONF_NAME
                 + " -p " + dataHomeDir;
         Map<String, String> environmentVars = new HashMap<>();
-        environmentVars.put("HOME", dataHomeDir);
+        environmentVars.put("OPENTEE_STORAGE_PATH", dataHomeDir + File.separator + ".TEE_secure_storage" + File.separator);
+        environmentVars.put("OPENTEE_SOCKET_FILE_PATH", dataHomeDir + File.separator + "open_tee_socket");
         environmentVars.put("LD_LIBRARY_PATH", context.getApplicationInfo().dataDir + File.separator + "lib");
         Log.d(OPEN_TEE_SERVICE_TAG, "LD_LIBRARY_PATH: " + context.getApplicationInfo().dataDir + File.separator + "lib");
         execBinaryFromHomeDir(context, command, environmentVars);
