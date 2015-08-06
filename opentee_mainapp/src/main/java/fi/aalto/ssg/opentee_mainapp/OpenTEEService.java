@@ -61,9 +61,11 @@ public class OpenTEEService extends Service {
     public static final int MSG_STOP_OPENTEE_ENGINE = 7;
     public static final int MSG_START_OPENTEE_ENGINE = 8;
     public static final int MSG_RESTART_OPENTEE_ENGINE = 9;
+    public static final int MSG_INSTALL_BYTE_BLOB = 10;
     public static final String MSG_ASSET_NAME = "MSG_ASSET_NAME";
     public static final String MSG_FILE_NAME = "MSG_FILE_NAME";
     public static final String MSG_DEST_SUBDIR = "MSG_DEST_SUBDIR";
+    public static final String MSG_BYTE_ARRAY = "MSG_BYTE_ARRAY";
     public static final String MSG_CONF_NAME = "MSG_CONF_NAME";
     public static final String MSG_OVERWRITE = "MSG_OVERWRITE";
 
@@ -100,6 +102,14 @@ public class OpenTEEService extends Service {
                     break;
                 case OpenTEEService.MSG_INSTALL_FILE:
                     installFileToHomeDir(mContext.get(), data.getString(MSG_FILE_NAME), data.getString(MSG_DEST_SUBDIR), data.getBoolean(MSG_OVERWRITE));
+                    break;
+                case OpenTEEService.MSG_INSTALL_BYTE_BLOB:
+                    try {
+                        installBytesToHomedir(mContext.get(), data.getByteArray(MSG_BYTE_ARRAY), data.getString(MSG_DEST_SUBDIR), data.getString(MSG_ASSET_NAME), data.getBoolean(MSG_OVERWRITE));
+                    } catch (IOException | InterruptedException e) {
+                        Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
+                        e.printStackTrace();
+                    }
                     break;
                 case OpenTEEService.MSG_STOP_OPENTEE_ENGINE:
                     stopOpenTEEEngine(mContext.get());
@@ -187,7 +197,8 @@ public class OpenTEEService extends Service {
                     String originAssetPath = Build.SUPPORTED_ABIS[0] + File.separator + assetName;
                     Log.d(OPEN_TEE_SERVICE_TAG, "Copying from: " + originAssetPath);
                     try (InputStream inFile = context.getAssets().open(originAssetPath)) {
-                        installStreamToHomedir(context, inFile, destSubdir, assetName, overwrite);
+                        byte[] inBytes = Utils.readBytesFromStream(inFile);
+                        installBytesToHomedir(context, inBytes, destSubdir, assetName, overwrite);
                     } catch (IOException | InterruptedException e) {
                         Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
                         e.printStackTrace();
@@ -204,7 +215,8 @@ public class OpenTEEService extends Service {
                     try (InputStream inFile = new FileInputStream(filePath)) {
                         // last string after File.separator is our file's name
                         String fileName = filePath.substring(filePath.lastIndexOf(File.pathSeparatorChar));
-                        installStreamToHomedir(context, inFile, destSubdir, fileName, overwrite);
+                        byte[] inBytes = Utils.readBytesFromStream(inFile);
+                        installBytesToHomedir(context, inBytes, destSubdir, fileName, overwrite);
                     } catch (IOException | InterruptedException e) {
                         Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
                         e.printStackTrace();
@@ -213,7 +225,7 @@ public class OpenTEEService extends Service {
             });
     }
 
-    private void installStreamToHomedir(Context context, InputStream inFile, String destSubdir, String assetName, boolean overwrite) throws IOException, InterruptedException {
+    private void installBytesToHomedir(Context context, byte[] inBytes, String destSubdir, String assetName, boolean overwrite) throws IOException, InterruptedException {
         String destPath = Utils.getFullFileDataPath(context);
         // if you have to install in a subdir, check and create it if necessary
         if (destSubdir != null) {
@@ -229,9 +241,10 @@ public class OpenTEEService extends Service {
         if (!outFile.exists() || overwrite) {
             // Copy and chmod the new file
             Log.d(OPEN_TEE_SERVICE_TAG, "Copying to: " + destPath);
-            Utils.copyStream(context,
-                    inFile,
-                    new FileOutputStream(outFile, false)); // we don't want to append, just (over)write
+            FileOutputStream outputStream =
+                    new FileOutputStream(outFile, false); // we don't want to append, just (over)write
+            outputStream.write(inBytes);
+            outputStream.close();
             String output = Utils.execUnixCommand(("/system/bin/chmod 744 " + destPath).split(" "), null);
             if (!output.isEmpty()) {
                 Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);

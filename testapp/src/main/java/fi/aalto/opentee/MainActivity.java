@@ -29,7 +29,9 @@ import org.opensc.pkcs11.PKCS11LoadStoreParameter;
 import org.opensc.pkcs11.PKCS11Provider;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
@@ -76,6 +78,7 @@ public class MainActivity extends Activity {
 
     private void runTests() {
         testInstallationOfOpenTEEToHomeDir();
+        testInstallFileStream();
         testRestartOpenTEE(); // Also cleans up any remains from previous runs
         //testStopOpenTEE();
     }
@@ -171,6 +174,39 @@ public class MainActivity extends Activity {
         }
     }
 
+    public void testInstallFileStream() {
+        if (!mBound) return;
+        // Create and send a message to the service, using a supported 'what' value
+        Message msg = Message.obtain(null, OpenTEEService.MSG_INSTALL_BYTE_BLOB, 0, 0);
+        Bundle b = new Bundle();
+
+        b.putString(OpenTEEService.MSG_ASSET_NAME, "testFile");
+        b.putString(OpenTEEService.MSG_DEST_SUBDIR, Constants.OPENTEE_BIN_DIR);
+        b.putBoolean(OpenTEEService.MSG_OVERWRITE, true);
+        InputStream inFile = null;
+        try {
+            String originPath = Utils.getFullFileDataPath(getApplicationContext()) + File.separator + Constants.OPENTEE_CONF_NAME;
+            inFile = new FileInputStream(originPath);
+        } catch (IOException e) {
+            Log.e("MAINACTIVITY", e.getMessage());
+            e.printStackTrace();
+        }
+        byte[] inBytes = new byte[0];
+        try {
+            inBytes = Utils.readBytesFromStream(inFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        b.putByteArray(OpenTEEService.MSG_BYTE_ARRAY, inBytes);
+
+        msg.setData(b);
+        try {
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * Runs opentee binary from home dir bin/ folder
      * e.g. to run opentee provide the following as argument:

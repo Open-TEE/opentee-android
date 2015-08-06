@@ -17,6 +17,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -66,7 +67,7 @@ public class Utils {
         return sb.toString();
     }
 
-    public static void copyStream(Context context, InputStream in, FileOutputStream out) throws IOException {
+    public static void copyStream(InputStream in, FileOutputStream out) throws IOException {
         int read;
         byte[] buffer = new byte[4096];
         while ((read = in.read(buffer)) > 0) {
@@ -75,7 +76,6 @@ public class Utils {
         out.close();
         in.close();
     }
-
 
     public static File checkAndCreateDir(String dirPath) {
         File dataPath = new File(dirPath);
@@ -114,5 +114,15 @@ public class Utils {
         } finally {
             scanner.close();
         }
+    }
+
+    public static byte[] readBytesFromStream(InputStream inFile) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        int read = inFile.read();
+        while (read != -1) {
+            byteArrayOutputStream.write(read);
+            read = inFile.read();
+        }
+        return byteArrayOutputStream.toByteArray();
     }
 }
