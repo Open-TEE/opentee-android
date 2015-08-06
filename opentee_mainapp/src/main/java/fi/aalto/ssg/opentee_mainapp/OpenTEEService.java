@@ -305,7 +305,7 @@ public class OpenTEEService extends Service {
             mExecutor.submit(new Runnable() {
                 public void run() {
                     try {
-                        String destPath = Utils.getFullFileDataPath(context) + File.separator + binaryName;
+                        String destPath = Utils.getFullFileDataPath(context) + File.separator + binaryName + " &";
                         String output = Utils.execUnixCommand(destPath.split(" "), environmentVars);
                         if (!output.isEmpty()) {
                             Log.d(OPEN_TEE_SERVICE_TAG, "Execution of binary " + destPath + " returned: " + output);
