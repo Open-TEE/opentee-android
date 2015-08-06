@@ -10,7 +10,7 @@ corresponding openteelib ones so that there are no code duplicates.
 
 In either case you will need to also:
 
-1. download the android ndk, add the directory to your enviroment PATH and also edit the local.properties file in this
+1. download the android ndk, add the directory to your environment PATH and also edit the local.properties file in this
    repo and adjust it there too. Same for the android-sdk.
 
 2. set the java target version to 1.7

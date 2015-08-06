@@ -75,6 +75,7 @@ public class MainActivity extends Activity {
     };
 
     private void runTests() {
+        testInstallationOfOpenTEEToHomeDir();
         testRestartOpenTEE(); // Also cleans up any remains from previous runs
         //testStopOpenTEE();
     }

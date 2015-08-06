@@ -5,6 +5,9 @@ All binaries and libraries loaded by the native code are in src/main/assets/{arm
 libraries that are dynamically loaded by the native code (and not as a dependency) are in
 src/main/libs/{armeabi,armeabi-v7a,x86} and are loaded by the java middleware layer.
 
+You can use the `install_opentee_files.sh` script to install the binaries and libraries to the appropriate directories
+easily.
+
 ##License
 
 This source code is available under the terms of the Apache License, Version 2.0:
