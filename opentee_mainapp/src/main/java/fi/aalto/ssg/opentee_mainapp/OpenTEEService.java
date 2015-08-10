@@ -401,14 +401,15 @@ public class OpenTEEService extends Service {
                                 }
                             }
                         }
+                        String dataHomeDir = Utils.getFullFileDataPath(context);
                         // Delete socket file
-                        String command = "/system/bin/rm " + Constants.OPENTEE_SOCKET_PATH;
+                        String command = "/system/bin/rm " + dataHomeDir + File.separator + Constants.OPENTEE_SOCKET_FILENAME;
                         String output = Utils.execUnixCommand(command.split(" "), null);
                         if (!output.isEmpty()) {
                             Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);
                         }
                         // Delete pid file
-                        command = "/system/bin/rm " + Utils.getFullFileDataPath(context) + File.separator + Constants.OPENTEE_PID_FILENAME;
+                        command = "/system/bin/rm " + dataHomeDir  + File.separator + Constants.OPENTEE_PID_FILENAME;
                         output = Utils.execUnixCommand(command.split(" "), null);
                         if (!output.isEmpty()) {
                             Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);

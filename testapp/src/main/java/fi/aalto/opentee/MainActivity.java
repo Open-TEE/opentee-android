@@ -14,15 +14,7 @@
 package fi.aalto.opentee;
 
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.util.Log;
 
 import org.opensc.pkcs11.PKCS11LoadStoreParameter;
@@ -41,40 +33,14 @@ import java.util.Enumeration;
 import java.util.Random;
 
 import fi.aalto.ssg.opentee_mainapp.Constants;
-import fi.aalto.ssg.opentee_mainapp.OpenTEEService;
+import fi.aalto.ssg.opentee_mainapp.OTCallback;
+import fi.aalto.ssg.opentee_mainapp.OpenTEEConnection;
 import fi.aalto.ssg.opentee_mainapp.Utils;
 
 
 public class MainActivity extends Activity {
 
-    /** Messenger for communicating with the service. */
-    private Messenger mService = null;
-
-    /** Flag indicating whether we have called bind on the service. */
-    private boolean mBound;
-
-    /**
-     * Class for interacting with the main interface of the service.
-     */
-    private ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // This is called when the connection with the service has been
-            // established, giving us the object we can use to
-            // interact with the service.  We are communicating with the
-            // service using a Messenger, so here we get a client-side
-            // representation of that from the raw IBinder object.
-            mService = new Messenger(service);
-            mBound = true;
-            runTests();
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            // This is called when the connection with the service has been
-            // unexpectedly disconnected -- that is, its process crashed.
-            mService = null;
-            mBound = false;
-        }
-    };
+    private OpenTEEConnection mOpenTEEConnection;
 
     private void runTests() {
         testInstallationOfOpenTEEToHomeDir();
@@ -90,99 +56,46 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startService();
+        mOpenTEEConnection = new OpenTEEConnection(this, new OTCallback() {
+            @Override
+            public void onConnectionEstablished() {
+                runTests();
+            }
+
+            @Override
+            public void onConnectionDestroyed() { }
+        });
+
     }
 
     @Override
     protected void onDestroy() {
-
-        stopService();
+        mOpenTEEConnection.stopConnection();
         super.onDestroy();
     }
     /* opentee_mainapp tests */
 
-    public void startService() {
-        // Bind to the service
-        bindService(new Intent(this, OpenTEEService.class), mConnection,
-                Context.BIND_AUTO_CREATE);
-    }
-
-    public void stopService() {
-        // Unbind from the service
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
-
-    }
-
     public void testStartOpenTEE() {
-        if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
-        Message msg = Message.obtain(null, OpenTEEService.MSG_START_OPENTEE_ENGINE, 0, 0);
-        try {
-            mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        mOpenTEEConnection.startOTEngine();
     }
 
     public void testRestartOpenTEE() {
-        if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
-        Message msg = Message.obtain(null, OpenTEEService.MSG_RESTART_OPENTEE_ENGINE, 0, 0);
-        try {
-            mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        mOpenTEEConnection.restartOTEngine();
     }
 
     public void testStopOpenTEE() {
-        if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
-        Message msg = Message.obtain(null, OpenTEEService.MSG_STOP_OPENTEE_ENGINE, 0, 0);
-        try {
-            mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        mOpenTEEConnection.stopOTEngine();
     }
 
     public void testSELinuxToPermissive() {
-        if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
-        Message msg = Message.obtain(null, OpenTEEService.MSG_SELINUX_TO_PERMISSIVE, 0, 0);
-        try {
-            mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        mOpenTEEConnection.changeSELinuxToPermissive();
     }
 
     public void testInstallationOfOpenTEEToHomeDir() {
-        if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
-        Message msg = Message.obtain(null, OpenTEEService.MSG_INSTALL_ALL, 0, 0);
-        Bundle b = new Bundle();
-        b.putBoolean(OpenTEEService.MSG_OVERWRITE, true);
-        msg.setData(b);
-        try {
-            mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        mOpenTEEConnection.installOpenTEEToHomeDir(true);
     }
 
     public void testInstallFileStream() {
-        if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
-        Message msg = Message.obtain(null, OpenTEEService.MSG_INSTALL_BYTE_BLOB, 0, 0);
-        Bundle b = new Bundle();
-
-        b.putString(OpenTEEService.MSG_ASSET_NAME, "testFile");
-        b.putString(OpenTEEService.MSG_DEST_SUBDIR, Constants.OPENTEE_BIN_DIR);
-        b.putBoolean(OpenTEEService.MSG_OVERWRITE, true);
         InputStream inFile = null;
         try {
             String originPath = Utils.getFullFileDataPath(getApplicationContext()) + File.separator + Constants.OPENTEE_CONF_NAME;
@@ -198,14 +111,7 @@ public class MainActivity extends Activity {
             e.printStackTrace();
             return;
         }
-        b.putByteArray(OpenTEEService.MSG_BYTE_ARRAY, inBytes);
-
-        msg.setData(b);
-        try {
-            mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        mOpenTEEConnection.installByteStreamTA(inBytes, "testFile", Constants.OPENTEE_BIN_DIR, true);
     }
     /**
      * Runs opentee binary from home dir bin/ folder
@@ -213,20 +119,7 @@ public class MainActivity extends Activity {
      * Constants.OPENTEE_BIN_DIR + File.separator + Constants.OPENTEE_ENGINE_ASSET_BIN_NAME
      */
     public void testRunBinary(String openteeBinary) {
-        if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
-        Message msg = Message.obtain(null, OpenTEEService.MSG_RUN_BIN, 0, 0);
-        Bundle b = new Bundle();
-        String dataHomeDir = Utils.getFullFileDataPath(getApplicationContext());
-        b.putString(OpenTEEService.MSG_ASSET_NAME, Constants.OPENTEE_BIN_DIR + File.separator + Constants.OPENTEE_ENGINE_ASSET_BIN_NAME + " -c "
-                + dataHomeDir + File.separator + Constants.OPENTEE_CONF_NAME
-                + " -p " + dataHomeDir);
-        msg.setData(b);
-        try {
-            mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        mOpenTEEConnection.runOTBinary(openteeBinary);
     }
 
     /* openteelib tests */

@@ -33,7 +33,7 @@ public class Constants {
     public static final String LIB_MANAGER_API_ASSET_TEE_NAME = "libManagerApi.so";
     public static final String OPENTEE_CONF_NAME = "opentee.conf.android";
 
-    public static final String OPENTEE_SOCKET_PATH = "/data/local/tmp/open_tee_sock";
+    public static final String OPENTEE_SOCKET_FILENAME = "open_tee_socket";
     public static final String OPENTEE_PID_FILENAME = "opentee-engine.pid";
 
     // Placeholder used in the assets/opentee.conf.android to be replaced at installation with the app data home dir
