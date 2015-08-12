@@ -73,12 +73,14 @@ public class OpenTEEConnection {
         Log.d(OPENTEECONNECTION_TAG, "Connection to OPTEEService returned: " + result);
     }
 
-    public boolean startConnection() {// Bind to the service
+    public boolean startConnection() {
+        // Bind to the service
         return mContext.bindService(new Intent(mContext, OpenTEEService.class), mConnection,
                 Context.BIND_AUTO_CREATE);
     }
 
-    public void stopConnection() {// Unbind from the service
+    public void stopConnection() {
+        // Unbind from the service
         if (mBound) {
             mContext.unbindService(mConnection);
             mBound = false;
@@ -90,7 +92,8 @@ public class OpenTEEConnection {
         // Create and send a message to the service, using a supported 'what' value
         Message msg = Message.obtain(null, OpenTEEService.MSG_START_OPENTEE_ENGINE, 0, 0);
         try {
-            mService.send(msg);
+            if (mService != null)
+                mService.send(msg);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -101,7 +104,8 @@ public class OpenTEEConnection {
         // Create and send a message to the service, using a supported 'what' value
         Message msg = Message.obtain(null, OpenTEEService.MSG_RESTART_OPENTEE_ENGINE, 0, 0);
         try {
-            mService.send(msg);
+            if (mService != null)
+                mService.send(msg);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -112,7 +116,8 @@ public class OpenTEEConnection {
         // Create and send a message to the service, using a supported 'what' value
         Message msg = Message.obtain(null, OpenTEEService.MSG_STOP_OPENTEE_ENGINE, 0, 0);
         try {
-            mService.send(msg);
+            if (mService != null)
+                mService.send(msg);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -123,7 +128,8 @@ public class OpenTEEConnection {
         // Create and send a message to the service, using a supported 'what' value
         Message msg = Message.obtain(null, OpenTEEService.MSG_SELINUX_TO_PERMISSIVE, 0, 0);
         try {
-            mService.send(msg);
+            if (mService != null)
+                mService.send(msg);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -137,7 +143,8 @@ public class OpenTEEConnection {
         b.putBoolean(OpenTEEService.MSG_OVERWRITE, overwrite);
         msg.setData(b);
         try {
-            mService.send(msg);
+            if (mService != null)
+                mService.send(msg);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -155,7 +162,8 @@ public class OpenTEEConnection {
         b.putByteArray(OpenTEEService.MSG_BYTE_ARRAY, inBytes);
         msg.setData(b);
         try {
-            mService.send(msg);
+            if (mService != null)
+                mService.send(msg);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -164,7 +172,7 @@ public class OpenTEEConnection {
     /**
      * Runs opentee binary from home dir bin/ folder
      * e.g. to run opentee provide the following as argument:
-     * Constants.OPENTEE_BIN_DIR + File.separator + Constants.OPENTEE_ENGINE_ASSET_BIN_NAME
+     * Constants.OPENTEE_ENGINE_ASSET_BIN_NAME
      */
     public void runOTBinary(String openteeBinary) {
         if (!mBound) return;
@@ -175,7 +183,8 @@ public class OpenTEEConnection {
         b.putString(OpenTEEService.MSG_ASSET_NAME, OTConstants.OPENTEE_BIN_DIR + File.separator + openteeBinary);
         msg.setData(b);
         try {
-            mService.send(msg);
+            if (mService != null)
+                mService.send(msg);
         } catch (RemoteException e) {
             e.printStackTrace();
         }

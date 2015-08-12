@@ -23,6 +23,8 @@ public class OTConstants {
 
     // These describe where the files are located in the assets/
     public static final String OPENTEE_ENGINE_ASSET_BIN_NAME = "opentee-engine";
+    public static final String CONN_TEST_APP_ASSET_BIN_NAME = "conn_test_app";
+    public static final String STORAGE_TEST_APP_ASSET_BIN_NAME = "storage_test";
     public static final String STORAGE_TEST_ASSET_BIN_NAME = "storage_test";
     public static final String STORAGE_TEST_CA_ASSET_BIN_NAME = "storage_test_ca";
     public static final String PKCS11_TEST_ASSET_BIN_NAME = "pkcs11_test";

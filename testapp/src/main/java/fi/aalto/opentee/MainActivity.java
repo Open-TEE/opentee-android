@@ -43,10 +43,13 @@ public class MainActivity extends Activity {
     private OpenTEEConnection mOpenTEEConnection;
 
     private void runTests() {
-        testInstallationOfOpenTEEToHomeDir();
+        mOpenTEEConnection.installOpenTEEToHomeDir(true);
         testInstallFileStream();
-        testRestartOpenTEE(); // Also cleans up any remains from previous runs
-        //testStopOpenTEE();
+        mOpenTEEConnection.restartOTEngine(); // Also cleans up any remains from previous runs
+
+        mOpenTEEConnection.runOTBinary(OTConstants.STORAGE_TEST_APP_ASSET_BIN_NAME);
+
+        //mOpenTEEConnection.stopOTEngine();
     }
 
     private static final String TAG = "MainActivity";
@@ -75,26 +78,6 @@ public class MainActivity extends Activity {
     }
     /* opentee_mainapp tests */
 
-    public void testStartOpenTEE() {
-        mOpenTEEConnection.startOTEngine();
-    }
-
-    public void testRestartOpenTEE() {
-        mOpenTEEConnection.restartOTEngine();
-    }
-
-    public void testStopOpenTEE() {
-        mOpenTEEConnection.stopOTEngine();
-    }
-
-    public void testSELinuxToPermissive() {
-        mOpenTEEConnection.changeSELinuxToPermissive();
-    }
-
-    public void testInstallationOfOpenTEEToHomeDir() {
-        mOpenTEEConnection.installOpenTEEToHomeDir(true);
-    }
-
     public void testInstallFileStream() {
         InputStream inFile = null;
         try {
@@ -104,7 +87,7 @@ public class MainActivity extends Activity {
             Log.e("MAINACTIVITY", e.getMessage());
             e.printStackTrace();
         }
-        byte[] inBytes = new byte[0];
+        byte[] inBytes;
         try {
             inBytes = OTUtils.readBytesFromStream(inFile);
         } catch (IOException e) {
@@ -112,14 +95,6 @@ public class MainActivity extends Activity {
             return;
         }
         mOpenTEEConnection.installByteStreamTA(inBytes, "testFile", OTConstants.OPENTEE_BIN_DIR, true);
-    }
-    /**
-     * Runs opentee binary from home dir bin/ folder
-     * e.g. to run opentee provide the following as argument:
-     * Constants.OPENTEE_BIN_DIR + File.separator + Constants.OPENTEE_ENGINE_ASSET_BIN_NAME
-     */
-    public void testRunBinary(String openteeBinary) {
-        mOpenTEEConnection.runOTBinary(openteeBinary);
     }
 
     /* openteelib tests */

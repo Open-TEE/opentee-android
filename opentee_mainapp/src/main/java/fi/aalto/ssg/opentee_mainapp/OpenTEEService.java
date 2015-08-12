@@ -122,8 +122,11 @@ public class OpenTEEService extends Service {
                     startOpenTEEEngine(mContext.get());
                     break;
                 case OpenTEEService.MSG_RUN_BIN:
+                    String dataHomeDir = OTUtils.getFullFileDataPath(mContext.get());
                     // Setup the environment variable HOME to point to data home directory
                     Map<String, String> environmentVars = new HashMap<>();
+                    environmentVars.put("OPENTEE_STORAGE_PATH", dataHomeDir + File.separator + ".TEE_secure_storage" + File.separator);
+                    environmentVars.put("OPENTEE_SOCKET_FILE_PATH", dataHomeDir + File.separator + "open_tee_socket");
                     environmentVars.put("LD_LIBRARY_PATH", mContext.get().getApplicationInfo().dataDir + File.separator + "lib");
                     Log.d(OPEN_TEE_SERVICE_TAG, "LD_LIBRARY_PATH: " + mContext.get().getApplicationInfo().dataDir + File.separator + "lib");
                     execBinaryFromHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME), environmentVars);
@@ -137,6 +140,7 @@ public class OpenTEEService extends Service {
                     installAssetToHomeDir(mContext.get(), OTConstants.PKCS11_TEST_ASSET_BIN_NAME, OTConstants.OPENTEE_BIN_DIR, overwrite);
                     installAssetToHomeDir(mContext.get(), OTConstants.LIB_TA_STORAGE_TEST_ASSET_TA_NAME, OTConstants.OPENTEE_TA_DIR, overwrite);
                     installAssetToHomeDir(mContext.get(), OTConstants.LIB_TA_PKCS11_ASSET_TA_NAME, OTConstants.OPENTEE_TA_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), OTConstants.CONN_TEST_APP_ASSET_BIN_NAME, OTConstants.OPENTEE_BIN_DIR, overwrite);
                     installAssetToHomeDir(mContext.get(), OTConstants.LIB_TA_CONN_TEST_APP_ASSET_TA_NAME, OTConstants.OPENTEE_TA_DIR, overwrite);
                     installAssetToHomeDir(mContext.get(), OTConstants.LIB_LAUNCHER_API_ASSET_TEE_NAME, OTConstants.OPENTEE_TEE_DIR, overwrite);
                     installAssetToHomeDir(mContext.get(), OTConstants.LIB_MANAGER_API_ASSET_TEE_NAME, OTConstants.OPENTEE_TEE_DIR, overwrite);
@@ -321,7 +325,7 @@ public class OpenTEEService extends Service {
                         String destPath = OTUtils.getFullFileDataPath(context) + File.separator + binaryName + " &";
                         String output = OTUtils.execUnixCommand(destPath.split(" "), environmentVars);
                         if (!output.isEmpty()) {
-                            Log.d(OPEN_TEE_SERVICE_TAG, "Execution of binary " + destPath + " returned: " + output);
+                            Log.d(OPEN_TEE_SERVICE_TAG, "Execution of binary " + destPath + " returned: \n" + output);
                         }
                     } catch (InterruptedException | IOException e) {
                         Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
@@ -406,13 +410,13 @@ public class OpenTEEService extends Service {
                         String command = "/system/bin/rm " + dataHomeDir + File.separator + OTConstants.OPENTEE_SOCKET_FILENAME;
                         String output = OTUtils.execUnixCommand(command.split(" "), null);
                         if (!output.isEmpty()) {
-                            Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);
+                            Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: \n" + output);
                         }
                         // Delete pid file
                         command = "/system/bin/rm " + dataHomeDir  + File.separator + OTConstants.OPENTEE_PID_FILENAME;
                         output = OTUtils.execUnixCommand(command.split(" "), null);
                         if (!output.isEmpty()) {
-                            Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);
+                            Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: \n" + output);
                         }
                     } catch (InterruptedException | IOException e) {
                         Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
