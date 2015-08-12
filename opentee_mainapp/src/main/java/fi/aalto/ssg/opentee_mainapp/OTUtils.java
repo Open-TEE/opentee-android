@@ -29,7 +29,7 @@ import java.util.Scanner;
 /**
  * Created by code on 6/24/15.
  */
-public class Utils {
+public class OTUtils {
 
     public static final String UTILS_TAG = "Utils";
 
@@ -95,7 +95,7 @@ public class Utils {
     }
 
     public static String getFullFileDataPath(Context context) {
-        File dataPath = checkAndCreateDir(context.getApplicationInfo().dataDir + File.separator + Constants.OPENTEE_DIR_NAME);
+        File dataPath = checkAndCreateDir(context.getApplicationInfo().dataDir + File.separator + OTConstants.OPENTEE_DIR_NAME);
         return dataPath.getAbsolutePath();
     }
 

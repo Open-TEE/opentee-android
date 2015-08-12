@@ -32,10 +32,10 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Random;
 
-import fi.aalto.ssg.opentee_mainapp.Constants;
+import fi.aalto.ssg.opentee_mainapp.OTConstants;
 import fi.aalto.ssg.opentee_mainapp.OTCallback;
 import fi.aalto.ssg.opentee_mainapp.OpenTEEConnection;
-import fi.aalto.ssg.opentee_mainapp.Utils;
+import fi.aalto.ssg.opentee_mainapp.OTUtils;
 
 
 public class MainActivity extends Activity {
@@ -98,7 +98,7 @@ public class MainActivity extends Activity {
     public void testInstallFileStream() {
         InputStream inFile = null;
         try {
-            String originPath = Utils.getFullFileDataPath(getApplicationContext()) + File.separator + Constants.OPENTEE_CONF_NAME;
+            String originPath = OTUtils.getFullFileDataPath(getApplicationContext()) + File.separator + OTConstants.OPENTEE_CONF_NAME;
             inFile = new FileInputStream(originPath);
         } catch (IOException e) {
             Log.e("MAINACTIVITY", e.getMessage());
@@ -106,12 +106,12 @@ public class MainActivity extends Activity {
         }
         byte[] inBytes = new byte[0];
         try {
-            inBytes = Utils.readBytesFromStream(inFile);
+            inBytes = OTUtils.readBytesFromStream(inFile);
         } catch (IOException e) {
             e.printStackTrace();
             return;
         }
-        mOpenTEEConnection.installByteStreamTA(inBytes, "testFile", Constants.OPENTEE_BIN_DIR, true);
+        mOpenTEEConnection.installByteStreamTA(inBytes, "testFile", OTConstants.OPENTEE_BIN_DIR, true);
     }
     /**
      * Runs opentee binary from home dir bin/ folder

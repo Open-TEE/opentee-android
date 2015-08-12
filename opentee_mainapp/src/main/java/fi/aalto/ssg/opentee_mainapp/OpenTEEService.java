@@ -129,17 +129,17 @@ public class OpenTEEService extends Service {
                     execBinaryFromHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME), environmentVars);
                     break;
                 case OpenTEEService.MSG_INSTALL_ALL:
-                    installConfigToHomeDir(mContext.get(), Constants.OPENTEE_CONF_NAME);
+                    installConfigToHomeDir(mContext.get(), OTConstants.OPENTEE_CONF_NAME);
                     boolean overwrite = data.getBoolean(MSG_OVERWRITE);
-                    installAssetToHomeDir(mContext.get(), Constants.OPENTEE_ENGINE_ASSET_BIN_NAME, Constants.OPENTEE_BIN_DIR, overwrite);
-                    installAssetToHomeDir(mContext.get(), Constants.STORAGE_TEST_ASSET_BIN_NAME, Constants.OPENTEE_BIN_DIR, overwrite);
-                    installAssetToHomeDir(mContext.get(), Constants.STORAGE_TEST_CA_ASSET_BIN_NAME, Constants.OPENTEE_BIN_DIR, overwrite);
-                    installAssetToHomeDir(mContext.get(), Constants.PKCS11_TEST_ASSET_BIN_NAME, Constants.OPENTEE_BIN_DIR, overwrite);
-                    installAssetToHomeDir(mContext.get(), Constants.LIB_TA_STORAGE_TEST_ASSET_TA_NAME, Constants.OPENTEE_TA_DIR, overwrite);
-                    installAssetToHomeDir(mContext.get(), Constants.LIB_TA_PKCS11_ASSET_TA_NAME, Constants.OPENTEE_TA_DIR, overwrite);
-                    installAssetToHomeDir(mContext.get(), Constants.LIB_TA_CONN_TEST_APP_ASSET_TA_NAME, Constants.OPENTEE_TA_DIR, overwrite);
-                    installAssetToHomeDir(mContext.get(), Constants.LIB_LAUNCHER_API_ASSET_TEE_NAME, Constants.OPENTEE_TEE_DIR, overwrite);
-                    installAssetToHomeDir(mContext.get(), Constants.LIB_MANAGER_API_ASSET_TEE_NAME, Constants.OPENTEE_TEE_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), OTConstants.OPENTEE_ENGINE_ASSET_BIN_NAME, OTConstants.OPENTEE_BIN_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), OTConstants.STORAGE_TEST_ASSET_BIN_NAME, OTConstants.OPENTEE_BIN_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), OTConstants.STORAGE_TEST_CA_ASSET_BIN_NAME, OTConstants.OPENTEE_BIN_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), OTConstants.PKCS11_TEST_ASSET_BIN_NAME, OTConstants.OPENTEE_BIN_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), OTConstants.LIB_TA_STORAGE_TEST_ASSET_TA_NAME, OTConstants.OPENTEE_TA_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), OTConstants.LIB_TA_PKCS11_ASSET_TA_NAME, OTConstants.OPENTEE_TA_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), OTConstants.LIB_TA_CONN_TEST_APP_ASSET_TA_NAME, OTConstants.OPENTEE_TA_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), OTConstants.LIB_LAUNCHER_API_ASSET_TEE_NAME, OTConstants.OPENTEE_TEE_DIR, overwrite);
+                    installAssetToHomeDir(mContext.get(), OTConstants.LIB_MANAGER_API_ASSET_TEE_NAME, OTConstants.OPENTEE_TEE_DIR, overwrite);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -197,7 +197,7 @@ public class OpenTEEService extends Service {
                     String originAssetPath = Build.SUPPORTED_ABIS[0] + File.separator + assetName;
                     Log.d(OPEN_TEE_SERVICE_TAG, "Copying from: " + originAssetPath);
                     try (InputStream inFile = context.getAssets().open(originAssetPath)) {
-                        byte[] inBytes = Utils.readBytesFromStream(inFile);
+                        byte[] inBytes = OTUtils.readBytesFromStream(inFile);
                         installBytesToHomedir(context, inBytes, destSubdir, assetName, overwrite);
                     } catch (IOException | InterruptedException e) {
                         Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
@@ -215,7 +215,7 @@ public class OpenTEEService extends Service {
                     try (InputStream inFile = new FileInputStream(filePath)) {
                         // last string after File.separator is our file's name
                         String fileName = filePath.substring(filePath.lastIndexOf(File.pathSeparatorChar));
-                        byte[] inBytes = Utils.readBytesFromStream(inFile);
+                        byte[] inBytes = OTUtils.readBytesFromStream(inFile);
                         installBytesToHomedir(context, inBytes, destSubdir, fileName, overwrite);
                     } catch (IOException | InterruptedException e) {
                         Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
@@ -226,11 +226,11 @@ public class OpenTEEService extends Service {
     }
 
     private void installBytesToHomedir(Context context, byte[] inBytes, String destSubdir, String assetName, boolean overwrite) throws IOException, InterruptedException {
-        String destPath = Utils.getFullFileDataPath(context);
+        String destPath = OTUtils.getFullFileDataPath(context);
         // if you have to install in a subdir, check and create it if necessary
         if (destSubdir != null) {
             destPath += File.separator + destSubdir;
-            Utils.checkAndCreateDir(destPath);
+            OTUtils.checkAndCreateDir(destPath);
         }
         destPath += File.separator + assetName;
         Log.d(OPEN_TEE_SERVICE_TAG, "App Data home Dir: " + destPath);
@@ -245,7 +245,7 @@ public class OpenTEEService extends Service {
                     new FileOutputStream(outFile, false); // we don't want to append, just (over)write
             outputStream.write(inBytes);
             outputStream.close();
-            String output = Utils.execUnixCommand(("/system/bin/chmod 744 " + destPath).split(" "), null);
+            String output = OTUtils.execUnixCommand(("/system/bin/chmod 744 " + destPath).split(" "), null);
             if (!output.isEmpty()) {
                 Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
             }
@@ -266,7 +266,7 @@ public class OpenTEEService extends Service {
             mExecutor.submit(new Runnable() {
                 public void run() {
                     String output = "";
-                    String destPath = Utils.getFullFileDataPath(context) + File.separator + confFileName;
+                    String destPath = OTUtils.getFullFileDataPath(context) + File.separator + confFileName;
 
                     // Asset folder containing the binary based on the first
                     // supported CPU architecture (ABI) (i.e. armeabi, armeabi-v7a, x86)
@@ -288,7 +288,7 @@ public class OpenTEEService extends Service {
 
                                 String line = null;
                                 while ((line = inReader.readLine()) != null) {
-                                    line = line.replaceAll("\\b" + Constants.OPENTEE_DIR_CONF_PLACEHOLDER + "\\b", Utils.getFullFileDataPath(context));
+                                    line = line.replaceAll("\\b" + OTConstants.OPENTEE_DIR_CONF_PLACEHOLDER + "\\b", OTUtils.getFullFileDataPath(context));
                                     System.out.println(line);
                                     outWriter.println(line);
                                 }
@@ -299,7 +299,7 @@ public class OpenTEEService extends Service {
                             } finally {
                                 inReader.close();
                             }
-                            output = Utils.execUnixCommand(("/system/bin/chmod 640 " + destPath).split(" "), null);
+                            output = OTUtils.execUnixCommand(("/system/bin/chmod 640 " + destPath).split(" "), null);
                             Log.d(OPEN_TEE_SERVICE_TAG, "Chmod returned: " + output);
 
                         } catch (InterruptedException | IOException e) {
@@ -318,8 +318,8 @@ public class OpenTEEService extends Service {
             mExecutor.submit(new Runnable() {
                 public void run() {
                     try {
-                        String destPath = Utils.getFullFileDataPath(context) + File.separator + binaryName + " &";
-                        String output = Utils.execUnixCommand(destPath.split(" "), environmentVars);
+                        String destPath = OTUtils.getFullFileDataPath(context) + File.separator + binaryName + " &";
+                        String output = OTUtils.execUnixCommand(destPath.split(" "), environmentVars);
                         if (!output.isEmpty()) {
                             Log.d(OPEN_TEE_SERVICE_TAG, "Execution of binary " + destPath + " returned: " + output);
                         }
@@ -363,9 +363,9 @@ public class OpenTEEService extends Service {
     }
 
     private void startOpenTEEEngine(Context context) {
-        String dataHomeDir = Utils.getFullFileDataPath(context);
-        String command = Constants.OPENTEE_BIN_DIR + File.separator + Constants.OPENTEE_ENGINE_ASSET_BIN_NAME + " -c "
-                + dataHomeDir + File.separator + Constants.OPENTEE_CONF_NAME
+        String dataHomeDir = OTUtils.getFullFileDataPath(context);
+        String command = OTConstants.OPENTEE_BIN_DIR + File.separator + OTConstants.OPENTEE_ENGINE_ASSET_BIN_NAME + " -c "
+                + dataHomeDir + File.separator + OTConstants.OPENTEE_CONF_NAME
                 + " -p " + dataHomeDir;
         Map<String, String> environmentVars = new HashMap<>();
         environmentVars.put("OPENTEE_STORAGE_PATH", dataHomeDir + File.separator + ".TEE_secure_storage" + File.separator);
@@ -383,10 +383,10 @@ public class OpenTEEService extends Service {
                         // Find PID of opentee-engine by reading pid file
                         String pid = null;
                         try {
-                            pid = Utils.readFileToString(
-                                    Utils.getFullFileDataPath(context)
+                            pid = OTUtils.readFileToString(
+                                    OTUtils.getFullFileDataPath(context)
                                             + File.separator
-                                            + Constants.OPENTEE_PID_FILENAME);
+                                            + OTConstants.OPENTEE_PID_FILENAME);
                         } catch (IOException e) {
                             Log.e(OPEN_TEE_SERVICE_TAG, e.getMessage());
                         }
@@ -401,16 +401,16 @@ public class OpenTEEService extends Service {
                                 }
                             }
                         }
-                        String dataHomeDir = Utils.getFullFileDataPath(context);
+                        String dataHomeDir = OTUtils.getFullFileDataPath(context);
                         // Delete socket file
-                        String command = "/system/bin/rm " + dataHomeDir + File.separator + Constants.OPENTEE_SOCKET_FILENAME;
-                        String output = Utils.execUnixCommand(command.split(" "), null);
+                        String command = "/system/bin/rm " + dataHomeDir + File.separator + OTConstants.OPENTEE_SOCKET_FILENAME;
+                        String output = OTUtils.execUnixCommand(command.split(" "), null);
                         if (!output.isEmpty()) {
                             Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);
                         }
                         // Delete pid file
-                        command = "/system/bin/rm " + dataHomeDir  + File.separator + Constants.OPENTEE_PID_FILENAME;
-                        output = Utils.execUnixCommand(command.split(" "), null);
+                        command = "/system/bin/rm " + dataHomeDir  + File.separator + OTConstants.OPENTEE_PID_FILENAME;
+                        output = OTUtils.execUnixCommand(command.split(" "), null);
                         if (!output.isEmpty()) {
                             Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: " + output);
                         }

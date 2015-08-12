@@ -13,7 +13,7 @@
  */
 package fi.aalto.ssg.opentee_mainapp;
 
-public class Constants {
+public class OTConstants {
 
     // Used as name for the directory containing our whole installation
     public static final String OPENTEE_DIR_NAME = "opentee";

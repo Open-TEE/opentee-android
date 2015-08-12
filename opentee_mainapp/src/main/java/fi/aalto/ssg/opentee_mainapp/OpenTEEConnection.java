@@ -171,8 +171,8 @@ public class OpenTEEConnection {
         // Create and send a message to the service, using a supported 'what' value
         Message msg = Message.obtain(null, OpenTEEService.MSG_RUN_BIN, 0, 0);
         Bundle b = new Bundle();
-        String dataHomeDir = Utils.getFullFileDataPath(mContext);
-        b.putString(OpenTEEService.MSG_ASSET_NAME, Constants.OPENTEE_BIN_DIR + File.separator + openteeBinary);
+        String dataHomeDir = OTUtils.getFullFileDataPath(mContext);
+        b.putString(OpenTEEService.MSG_ASSET_NAME, OTConstants.OPENTEE_BIN_DIR + File.separator + openteeBinary);
         msg.setData(b);
         try {
             mService.send(msg);
