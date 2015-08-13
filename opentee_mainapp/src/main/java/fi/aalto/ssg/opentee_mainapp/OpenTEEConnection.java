@@ -22,6 +22,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.system.ErrnoException;
 import android.util.Log;
 
 import java.io.File;
@@ -200,5 +201,16 @@ public class OpenTEEConnection {
 
     public static String getOTLConfPath(Context context) {
         return OTUtils.getFullFileDataPath(context) + File.separator + OTConstants.OPENTEE_CONF_NAME;
+    }
+
+    /**
+     * Should be called by any application using libtee, because libtee on Android expects to find the
+     * same environmental variables that Open-TEE had when it was called. Running this assures that libtee
+     * will be able to find the Socket file path with which it will communicate with the TA Manager.
+     * @param context
+     * @throws ErrnoException thrown by Os.setenv()
+     */
+    public static void setOSEnvironmentVariables(Context context) throws ErrnoException {
+        OTUtils.setOSEnvironmentVariables(context);
     }
 }

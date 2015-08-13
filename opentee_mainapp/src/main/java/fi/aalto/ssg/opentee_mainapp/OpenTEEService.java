@@ -40,7 +40,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -123,11 +122,8 @@ public class OpenTEEService extends Service {
                     break;
                 case OpenTEEService.MSG_RUN_BIN:
                     // Setup the environment variable HOME to point to data home directory
-                    Map<String, String> environmentVars = new HashMap<>();
-                    environmentVars.put("OPENTEE_STORAGE_PATH", OpenTEEConnection.getOTTEESecureStorageDir(mContext.get()));
-                    environmentVars.put("OPENTEE_SOCKET_FILE_PATH", OpenTEEConnection.getOTSocketFilePath(mContext.get()));
-                    environmentVars.put("LD_LIBRARY_PATH", OpenTEEConnection.getOTLDLibraryPath(mContext.get()));
-                    Log.d(OPEN_TEE_SERVICE_TAG, "LD_LIBRARY_PATH: " + OpenTEEConnection.getOTLDLibraryPath(mContext.get()));
+                    Map<String, String> environmentVars = OTUtils.getOTEnvironmentVariables(mContext.get());
+                    Log.d(OPEN_TEE_SERVICE_TAG, "LD_LIBRARY_PATH: " + environmentVars.get("LD_LIBRARY_PATH"));
                     execBinaryFromHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME), environmentVars);
                     break;
                 case OpenTEEService.MSG_INSTALL_ALL:
@@ -370,11 +366,8 @@ public class OpenTEEService extends Service {
         String command = OTConstants.OPENTEE_ENGINE_ASSET_BIN_NAME + " -c "
                 + OpenTEEConnection.getOTLConfPath(context)
                 + " -p " + OpenTEEConnection.getOTPIDDir(context);
-        Map<String, String> environmentVars = new HashMap<>();
-        environmentVars.put("OPENTEE_STORAGE_PATH", OpenTEEConnection.getOTTEESecureStorageDir(context));
-        environmentVars.put("OPENTEE_SOCKET_FILE_PATH", OpenTEEConnection.getOTSocketFilePath(context));
-        environmentVars.put("LD_LIBRARY_PATH", OpenTEEConnection.getOTLDLibraryPath(context));
-        Log.d(OPEN_TEE_SERVICE_TAG, "LD_LIBRARY_PATH: " + OpenTEEConnection.getOTLDLibraryPath(context));
+        Map<String, String> environmentVars = OTUtils.getOTEnvironmentVariables(context);
+        Log.d(OPEN_TEE_SERVICE_TAG, "LD_LIBRARY_PATH: " + environmentVars.get("LD_LIBRARY_PATH"));
         execBinaryFromHomeDir(context, command, environmentVars);
     }
 
@@ -404,7 +397,6 @@ public class OpenTEEService extends Service {
                                 }
                             }
                         }
-                        String dataHomeDir = OTUtils.getFullFileDataPath(context);
                         // Delete socket file
                         String command = "/system/bin/rm " + OpenTEEConnection.getOTSocketFilePath(context);
                         String output = OTUtils.execUnixCommand(command.split(" "), null);

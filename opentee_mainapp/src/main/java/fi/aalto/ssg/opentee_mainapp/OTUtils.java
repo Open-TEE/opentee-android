@@ -14,6 +14,8 @@
 package fi.aalto.ssg.opentee_mainapp;
 
 import android.content.Context;
+import android.system.ErrnoException;
+import android.system.Os;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -23,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -126,4 +129,25 @@ public class OTUtils {
         return byteArrayOutputStream.toByteArray();
     }
 
+    /**
+     * Returns a hashmap with the environmental variables necessary for Open-TEE binaries
+     * to function properly.
+     * @param context
+     * @return
+     */
+    public static Map<String, String> getOTEnvironmentVariables(Context context) {
+        Map<String, String> environmentVars = new HashMap<>();
+        environmentVars.put("OPENTEE_STORAGE_PATH", OpenTEEConnection.getOTTEESecureStorageDir(context));
+        environmentVars.put("OPENTEE_SOCKET_FILE_PATH", OpenTEEConnection.getOTSocketFilePath(context));
+        environmentVars.put("LD_LIBRARY_PATH", OpenTEEConnection.getOTLDLibraryPath(context));
+        return environmentVars;
+    }
+
+    public static void setOSEnvironmentVariables(Context context) throws ErrnoException {
+        // Set the same environmental variables that you use when you call Open-TEE binaries
+        Map<String, String> envVars = OTUtils.getOTEnvironmentVariables(context);
+        for (Map.Entry<String, String> entry : envVars.entrySet()) {
+            Os.setenv(entry.getKey(), entry.getValue(), true);
+        }
+    }
 }
