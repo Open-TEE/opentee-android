@@ -89,7 +89,6 @@ public class OpenTEEConnection {
 
     public void startOTEngine() {
         if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
         Message msg = Message.obtain(null, OpenTEEService.MSG_START_OPENTEE_ENGINE, 0, 0);
         try {
             if (mService != null)
@@ -101,7 +100,6 @@ public class OpenTEEConnection {
 
     public void restartOTEngine() {
         if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
         Message msg = Message.obtain(null, OpenTEEService.MSG_RESTART_OPENTEE_ENGINE, 0, 0);
         try {
             if (mService != null)
@@ -113,7 +111,6 @@ public class OpenTEEConnection {
 
     public void stopOTEngine() {
         if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
         Message msg = Message.obtain(null, OpenTEEService.MSG_STOP_OPENTEE_ENGINE, 0, 0);
         try {
             if (mService != null)
@@ -125,7 +122,6 @@ public class OpenTEEConnection {
 
     public void changeSELinuxToPermissive() {
         if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
         Message msg = Message.obtain(null, OpenTEEService.MSG_SELINUX_TO_PERMISSIVE, 0, 0);
         try {
             if (mService != null)
@@ -137,7 +133,6 @@ public class OpenTEEConnection {
 
     public void installOpenTEEToHomeDir(boolean overwrite) {
         if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
         Message msg = Message.obtain(null, OpenTEEService.MSG_INSTALL_ALL, 0, 0);
         Bundle b = new Bundle();
         b.putBoolean(OpenTEEService.MSG_OVERWRITE, overwrite);
@@ -152,7 +147,6 @@ public class OpenTEEConnection {
 
     public void installByteStreamTA(byte[] inBytes, String taName, String subdir, boolean overwrite) {
         if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
         Message msg = Message.obtain(null, OpenTEEService.MSG_INSTALL_BYTE_BLOB, 0, 0);
         Bundle b = new Bundle();
 
@@ -176,11 +170,9 @@ public class OpenTEEConnection {
      */
     public void runOTBinary(String openteeBinary) {
         if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
         Message msg = Message.obtain(null, OpenTEEService.MSG_RUN_BIN, 0, 0);
         Bundle b = new Bundle();
-        String dataHomeDir = OTUtils.getFullFileDataPath(mContext);
-        b.putString(OpenTEEService.MSG_ASSET_NAME, OTConstants.OPENTEE_BIN_DIR + File.separator + openteeBinary);
+        b.putString(OpenTEEService.MSG_ASSET_NAME, openteeBinary);
         msg.setData(b);
         try {
             if (mService != null)
@@ -188,5 +180,25 @@ public class OpenTEEConnection {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String getOTSocketFilePath(Context context) {
+        return OTUtils.getFullFileDataPath(context) + File.separator + OTConstants.OPENTEE_SOCKET_FILENAME;
+    }
+
+    public static String getOTPIDDir(Context context) {
+        return OTUtils.getFullFileDataPath(context);
+    }
+
+    public static String getOTTEESecureStorageDir(Context context) {
+        return OTUtils.getFullFileDataPath(context) + File.separator + OTConstants.OPENTEE_SECURE_STORAGE_DIRNAME + File.separator;
+    }
+
+    public static String getOTLDLibraryPath(Context context) {
+        return context.getApplicationInfo().dataDir + File.separator + OTConstants.OPENTEE_LIB_DEPENDENCY_DIR;
+    }
+
+    public static String getOTLConfPath(Context context) {
+        return OTUtils.getFullFileDataPath(context) + File.separator + OTConstants.OPENTEE_CONF_NAME;
     }
 }

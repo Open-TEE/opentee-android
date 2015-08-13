@@ -20,7 +20,6 @@ import android.util.Log;
 import org.opensc.pkcs11.PKCS11LoadStoreParameter;
 import org.opensc.pkcs11.PKCS11Provider;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,25 +31,15 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Random;
 
-import fi.aalto.ssg.opentee_mainapp.OTConstants;
 import fi.aalto.ssg.opentee_mainapp.OTCallback;
-import fi.aalto.ssg.opentee_mainapp.OpenTEEConnection;
+import fi.aalto.ssg.opentee_mainapp.OTConstants;
 import fi.aalto.ssg.opentee_mainapp.OTUtils;
+import fi.aalto.ssg.opentee_mainapp.OpenTEEConnection;
 
 
 public class MainActivity extends Activity {
 
     private OpenTEEConnection mOpenTEEConnection;
-
-    private void runTests() {
-        mOpenTEEConnection.installOpenTEEToHomeDir(true);
-        testInstallFileStream();
-        mOpenTEEConnection.restartOTEngine(); // Also cleans up any remains from previous runs
-
-        mOpenTEEConnection.runOTBinary(OTConstants.STORAGE_TEST_APP_ASSET_BIN_NAME);
-
-        //mOpenTEEConnection.stopOTEngine();
-    }
 
     private static final String TAG = "MainActivity";
 
@@ -76,12 +65,24 @@ public class MainActivity extends Activity {
         mOpenTEEConnection.stopConnection();
         super.onDestroy();
     }
+
     /* opentee_mainapp tests */
+
+    private void runTests() {
+        mOpenTEEConnection.installOpenTEEToHomeDir(true);
+        testInstallFileStream();
+        mOpenTEEConnection.restartOTEngine(); // Also cleans up any remains from previous runs
+
+        mOpenTEEConnection.runOTBinary(OTConstants.STORAGE_TEST_APP_ASSET_BIN_NAME);
+
+        //mOpenTEEConnection.stopOTEngine();
+    }
 
     public void testInstallFileStream() {
         InputStream inFile = null;
         try {
-            String originPath = OTUtils.getFullFileDataPath(getApplicationContext()) + File.separator + OTConstants.OPENTEE_CONF_NAME;
+            // test by installing the conf file (our supposed TA).
+            String originPath = OpenTEEConnection.getOTLConfPath(getApplicationContext());
             inFile = new FileInputStream(originPath);
         } catch (IOException e) {
             Log.e("MAINACTIVITY", e.getMessage());
@@ -94,7 +95,7 @@ public class MainActivity extends Activity {
             e.printStackTrace();
             return;
         }
-        mOpenTEEConnection.installByteStreamTA(inBytes, "testFile", OTConstants.OPENTEE_BIN_DIR, true);
+        mOpenTEEConnection.installByteStreamTA(inBytes, "testFile", OTConstants.OPENTEE_TA_DIR, true);
     }
 
     /* openteelib tests */

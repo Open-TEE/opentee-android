@@ -20,6 +20,7 @@ public class OTConstants {
     public static final String OPENTEE_BIN_DIR = "bin";
     public static final String OPENTEE_TA_DIR = "ta";
     public static final String OPENTEE_TEE_DIR = "tee";
+    public static final String OPENTEE_LIB_DEPENDENCY_DIR = "lib";
 
     // These describe where the files are located in the assets/
     public static final String OPENTEE_ENGINE_ASSET_BIN_NAME = "opentee-engine";
@@ -37,6 +38,7 @@ public class OTConstants {
 
     public static final String OPENTEE_SOCKET_FILENAME = "open_tee_socket";
     public static final String OPENTEE_PID_FILENAME = "opentee-engine.pid";
+    public static final String OPENTEE_SECURE_STORAGE_DIRNAME = ".TEE_secure_storage";
 
     // Placeholder used in the assets/opentee.conf.android to be replaced at installation with the app data home dir
     public static final String OPENTEE_DIR_CONF_PLACEHOLDER = "OPENTEEDIR";

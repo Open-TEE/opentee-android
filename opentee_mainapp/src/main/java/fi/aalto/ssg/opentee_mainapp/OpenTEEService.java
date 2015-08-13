@@ -122,13 +122,12 @@ public class OpenTEEService extends Service {
                     startOpenTEEEngine(mContext.get());
                     break;
                 case OpenTEEService.MSG_RUN_BIN:
-                    String dataHomeDir = OTUtils.getFullFileDataPath(mContext.get());
                     // Setup the environment variable HOME to point to data home directory
                     Map<String, String> environmentVars = new HashMap<>();
-                    environmentVars.put("OPENTEE_STORAGE_PATH", dataHomeDir + File.separator + ".TEE_secure_storage" + File.separator);
-                    environmentVars.put("OPENTEE_SOCKET_FILE_PATH", dataHomeDir + File.separator + "open_tee_socket");
-                    environmentVars.put("LD_LIBRARY_PATH", mContext.get().getApplicationInfo().dataDir + File.separator + "lib");
-                    Log.d(OPEN_TEE_SERVICE_TAG, "LD_LIBRARY_PATH: " + mContext.get().getApplicationInfo().dataDir + File.separator + "lib");
+                    environmentVars.put("OPENTEE_STORAGE_PATH", OpenTEEConnection.getOTTEESecureStorageDir(mContext.get()));
+                    environmentVars.put("OPENTEE_SOCKET_FILE_PATH", OpenTEEConnection.getOTSocketFilePath(mContext.get()));
+                    environmentVars.put("LD_LIBRARY_PATH", OpenTEEConnection.getOTLDLibraryPath(mContext.get()));
+                    Log.d(OPEN_TEE_SERVICE_TAG, "LD_LIBRARY_PATH: " + OpenTEEConnection.getOTLDLibraryPath(mContext.get()));
                     execBinaryFromHomeDir(mContext.get(), data.getString(MSG_ASSET_NAME), environmentVars);
                     break;
                 case OpenTEEService.MSG_INSTALL_ALL:
@@ -322,7 +321,7 @@ public class OpenTEEService extends Service {
             mExecutor.submit(new Runnable() {
                 public void run() {
                     try {
-                        String destPath = OTUtils.getFullFileDataPath(context) + File.separator + binaryName + " &";
+                        String destPath = OTUtils.getFullFileDataPath(context) + File.separator + OTConstants.OPENTEE_BIN_DIR + File.separator + binaryName + " &";
                         String output = OTUtils.execUnixCommand(destPath.split(" "), environmentVars);
                         if (!output.isEmpty()) {
                             Log.d(OPEN_TEE_SERVICE_TAG, "Execution of binary " + destPath + " returned: \n" + output);
@@ -338,6 +337,7 @@ public class OpenTEEService extends Service {
      * Necessary for open_tee_sock to be created. open_tee_sock is used for communication between manager and
      * libtee and by default SELinux disallows the usage of /data/local/tmp which is hardcoded in OpenTEE.
      * Also chmod is run on the directory where open_tee_sock is by default created since it's still not configurable.
+     * This is NOT USED anymore, but is left here as a sample implementation.
      * <p/>
      * Requires root permissions. Needs SuperSu to work. Alternatively just
      * run "su -c setenforce 0" through adb root.
@@ -367,15 +367,14 @@ public class OpenTEEService extends Service {
     }
 
     private void startOpenTEEEngine(Context context) {
-        String dataHomeDir = OTUtils.getFullFileDataPath(context);
-        String command = OTConstants.OPENTEE_BIN_DIR + File.separator + OTConstants.OPENTEE_ENGINE_ASSET_BIN_NAME + " -c "
-                + dataHomeDir + File.separator + OTConstants.OPENTEE_CONF_NAME
-                + " -p " + dataHomeDir;
+        String command = OTConstants.OPENTEE_ENGINE_ASSET_BIN_NAME + " -c "
+                + OpenTEEConnection.getOTLConfPath(context)
+                + " -p " + OpenTEEConnection.getOTPIDDir(context);
         Map<String, String> environmentVars = new HashMap<>();
-        environmentVars.put("OPENTEE_STORAGE_PATH", dataHomeDir + File.separator + ".TEE_secure_storage" + File.separator);
-        environmentVars.put("OPENTEE_SOCKET_FILE_PATH", dataHomeDir + File.separator + "open_tee_socket");
-        environmentVars.put("LD_LIBRARY_PATH", context.getApplicationInfo().dataDir + File.separator + "lib");
-        Log.d(OPEN_TEE_SERVICE_TAG, "LD_LIBRARY_PATH: " + context.getApplicationInfo().dataDir + File.separator + "lib");
+        environmentVars.put("OPENTEE_STORAGE_PATH", OpenTEEConnection.getOTTEESecureStorageDir(context));
+        environmentVars.put("OPENTEE_SOCKET_FILE_PATH", OpenTEEConnection.getOTSocketFilePath(context));
+        environmentVars.put("LD_LIBRARY_PATH", OpenTEEConnection.getOTLDLibraryPath(context));
+        Log.d(OPEN_TEE_SERVICE_TAG, "LD_LIBRARY_PATH: " + OpenTEEConnection.getOTLDLibraryPath(context));
         execBinaryFromHomeDir(context, command, environmentVars);
     }
 
@@ -388,7 +387,7 @@ public class OpenTEEService extends Service {
                         String pid = null;
                         try {
                             pid = OTUtils.readFileToString(
-                                    OTUtils.getFullFileDataPath(context)
+                                    OpenTEEConnection.getOTPIDDir(context)
                                             + File.separator
                                             + OTConstants.OPENTEE_PID_FILENAME);
                         } catch (IOException e) {
@@ -407,13 +406,13 @@ public class OpenTEEService extends Service {
                         }
                         String dataHomeDir = OTUtils.getFullFileDataPath(context);
                         // Delete socket file
-                        String command = "/system/bin/rm " + dataHomeDir + File.separator + OTConstants.OPENTEE_SOCKET_FILENAME;
+                        String command = "/system/bin/rm " + OpenTEEConnection.getOTSocketFilePath(context);
                         String output = OTUtils.execUnixCommand(command.split(" "), null);
                         if (!output.isEmpty()) {
                             Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: \n" + output);
                         }
                         // Delete pid file
-                        command = "/system/bin/rm " + dataHomeDir  + File.separator + OTConstants.OPENTEE_PID_FILENAME;
+                        command = "/system/bin/rm " + OpenTEEConnection.getOTPIDDir(context)  + File.separator + OTConstants.OPENTEE_PID_FILENAME;
                         output = OTUtils.execUnixCommand(command.split(" "), null);
                         if (!output.isEmpty()) {
                             Log.d(OPEN_TEE_SERVICE_TAG, "Execution of " + command + " returned: \n" + output);
