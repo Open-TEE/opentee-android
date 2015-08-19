@@ -31,10 +31,10 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Random;
 
-import fi.aalto.ssg.opentee_mainapp.OTCallback;
-import fi.aalto.ssg.opentee_mainapp.OTConstants;
-import fi.aalto.ssg.opentee_mainapp.OTUtils;
-import fi.aalto.ssg.opentee_mainapp.OpenTEEConnection;
+import fi.aalto.ssg.opentee.OTCallback;
+import fi.aalto.ssg.opentee.OTConstants;
+import fi.aalto.ssg.opentee.OTUtils;
+import fi.aalto.ssg.opentee.OpenTEEConnection;
 
 
 public class MainActivity extends Activity {
@@ -66,15 +66,15 @@ public class MainActivity extends Activity {
         super.onDestroy();
     }
 
-    /* opentee_mainapp tests */
+    /* opentee tests */
 
     private void runTests() {
         mOpenTEEConnection.installOpenTEEToHomeDir(true);
-        testInstallFileStream();
+
         mOpenTEEConnection.restartOTEngine(); // Also cleans up any remains from previous runs
 
         mOpenTEEConnection.runOTBinary(OTConstants.STORAGE_TEST_APP_ASSET_BIN_NAME);
-
+        testInstallFileStream();
         //mOpenTEEConnection.stopOTEngine();
     }
 

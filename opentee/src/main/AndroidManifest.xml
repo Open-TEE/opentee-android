@@ -6,7 +6,7 @@
         android:allowBackup="true"
         android:label="@string/app_name" >
         <service
-            android:name=".OpenTEEService"
+            android:name="fi.aalto.ssg.opentee.OpenTEEService"
             android:exported="false" >
         </service>
 

@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/opentee_mainapp/opentee.iml" filepath="$PROJECT_DIR$/opentee_mainapp/opentee.iml" />
       <module fileurl="file://$PROJECT_DIR$/opentee-android.iml" filepath="$PROJECT_DIR$/opentee-android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/opentee_mainapp/opentee_mainapp.iml" filepath="$PROJECT_DIR$/opentee_mainapp/opentee_mainapp.iml" />
       <module fileurl="file://$PROJECT_DIR$/openteelib/openteelib.iml" filepath="$PROJECT_DIR$/openteelib/openteelib.iml" />
       <module fileurl="file://$PROJECT_DIR$/testapp/testapp.iml" filepath="$PROJECT_DIR$/testapp/testapp.iml" />
     </modules>

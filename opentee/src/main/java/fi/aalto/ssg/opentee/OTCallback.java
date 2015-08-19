@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fi.aalto.ssg.opentee_mainapp;
+package fi.aalto.ssg.opentee;
 
 public abstract class OTCallback {
 

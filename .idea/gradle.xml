@@ -9,7 +9,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/opentee_mainapp" />
+            <option value="$PROJECT_DIR$/opentee" />
             <option value="$PROJECT_DIR$/openteelib" />
             <option value="$PROJECT_DIR$/testapp" />
           </set>

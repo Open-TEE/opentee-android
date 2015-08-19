@@ -1,1 +1,1 @@
-include ':testapp', ':openteelib', ':opentee_mainapp'
+include ':testapp', ':openteelib', ':opentee'

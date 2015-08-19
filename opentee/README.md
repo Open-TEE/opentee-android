@@ -6,7 +6,8 @@ libraries that are dynamically loaded by the native code (and not as a dependenc
 src/main/libs/{armeabi,armeabi-v7a,x86} and are loaded by the java middleware layer.
 
 You can use the `install_opentee_files.sh` script to install the binaries and libraries to the appropriate directories
-easily.
+easily. The script takes as input the $OUT (output directory) that exists after compiling Open-TEE against the android
+source tree. The subdirectories in $OUT should be system/, obj/, symbols/ .
 
 ##License
 

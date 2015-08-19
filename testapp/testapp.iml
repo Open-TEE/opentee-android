@@ -88,7 +88,7 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="opentee_mainapp" exported="" />
+    <orderEntry type="module" module-name="opentee" exported="" />
     <orderEntry type="module" module-name="openteelib" exported="" />
   </component>
 </module>

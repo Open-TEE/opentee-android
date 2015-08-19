@@ -1,4 +1,4 @@
-package fi.aalto.ssg.opentee_mainapp;
+package org.opentee.android;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
