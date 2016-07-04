@@ -1,0 +1,43 @@
+syntax = "proto2";
+package fi.aalto.ssg.opentee.imps.pbdatatypes;
+
+message TeecOperation{
+    required int32 mStarted = 1;
+    repeated TeecParameter mParams = 2;
+}
+
+message TeecParameter{
+    enum Type { smr = 1; val = 2; empty = 3;}
+
+    required Type type = 1;
+    optional TeecSharedMemoryReference teecSharedMemoryReference = 2;
+    optional TeecValue teecValue = 3;
+    optional int32 placeHolder = 4;
+}
+
+message TeecSharedMemory{
+    required bytes mBuffer = 1;
+    required int32 mFlag = 2;
+    required int32 size = 3;
+    optional int32 mReturnSize = 4;
+    optional int32 mID = 5;
+}
+
+message TeecSharedMemoryReference{
+    enum Flag{ TEEC_MEMREF_INPUT = 0x0000000D; TEEC_MEMREF_OUTPUT = 0x0000000E; TEEC_MEMREF_INOUT= 0x0000000F;}
+
+    required TeecSharedMemory parent = 1;
+    required int32  mOffset = 2;
+    required Flag mFlag = 3;
+
+}
+
+message TeecValue{
+    enum Flag{ TEEC_VALUE_INPUT = 0x0000001; TEEC_VALUE_OUTPUT = 0x00000002; TEEC_VALUE_INOUT= 0x00000003;}
+
+    required int32 a = 1;
+    required int32 b = 2;
+    required Flag mFlag = 3;
+
+}
+
