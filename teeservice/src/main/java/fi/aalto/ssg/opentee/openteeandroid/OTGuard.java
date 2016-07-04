@@ -23,6 +23,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import fi.aalto.ssg.opentee.ISyncOperation;
+import fi.aalto.ssg.opentee.OTUtils;
 import fi.aalto.ssg.opentee.imps.OTFactoryMethods;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 

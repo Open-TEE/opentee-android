@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fi.aalto.ssg.opentee.openteeandroid;
+package fi.aalto.ssg.opentee;
 
 import android.content.Context;
 import android.os.Build;
@@ -35,7 +35,7 @@ import java.util.concurrent.Executors;
  * this class is a single thread executor which can perform a list of task in a certain order
  * Credit: modified from previous opentee-android project
  */
-public class Worker{
+public class Worker {
     public static final String TAG_CLASS = "worker.class";
     public static final String CONF_ENCODING_STYLE = "UTF-8";
 
