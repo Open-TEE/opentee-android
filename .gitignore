@@ -1,6 +1,12 @@
 .gradle
+/local.properties
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store
 /build
 /captures
+opentee/src/main/obj/local/
+opentee/src/main/jni/libtee
+opentee/src/main/libs
+*~
+*.iml
