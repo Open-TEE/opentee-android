@@ -8,13 +8,14 @@ This repository consists of the following directories:
 
 - **document**: contains the design documents for this project, including the Java API documentation and [Rui Yang's MSc Thesis](document/thesis-main.pdf).
 
-- **opentee**: contains
+- **opentee**: has [Open-TEE](https://open-tee.github.io) along with utility functions to use Open-TEE in Android.
+
+- **otclient**: contains the Java API (OT-J) and an implementation of this API using Open-TEE. Android Client Applications (CAs) must import this module in order to interact with the **teeservice** module.
+
+- **teeservice**: contains
 	* TEE Proxy Service
 	* NativeLibtee
 	* Libtee
-	* [Open-TEE](https://open-tee.github.io)
-
-- **otclient**: contains the Java API (OT-J) and an implementation of this API using Open-TEE. Android Client Applications (CAs) must import this module in order to interact with the **opentee** module.
 
 - **testapp**: contains an Android test application which utilizes this Java API.
 
@@ -50,7 +51,7 @@ Clone this repository:
 ### Build with Android Studio
 1. Import **opentee-android** into Android Studio. Go to **File->New->Import Project...** and select the **opentee-android** under the **opentee-android-test** directory. Wait for Android Studio to finish the import task.
 2. You need either an Android device or an Android emulator to run our test application. To set up a debugging environment, follow the instructions at: https://developer.android.com/studio/run/index.html
-3. Run **opentee** run-time configuration by selecting the opentee from the drop-down list on the left side of the **Run** button. Click the **Run** button and select your target device, which can be either a real Android device or an emulator.
+3. Run **teeservice** run-time configuration by selecting the teeservice from the drop-down list on the left side of the **Run** button. Click the **Run** button and select your target device, which can be either a real Android device or an emulator.
 4. Follow the same steps as above to run the **testapp** run-time configuration.
 
 For any errors during this process, please refer to the **FAQ** section.
@@ -68,7 +69,7 @@ It is assumed that you have already installed the Android SDK and NDK (see prere
 	$ ./gradlew assembleDebug
 ```
 
-After successful compilation, the output will be two .apk files located in folder **opentee/build/outputs/apk/** and **testapp/build/outputs/apk/**. These can be installed and run on emulators or real devices as usual.
+After successful compilation, the output will be two .apk files located in folder **teeservice/build/outputs/apk/** and **testapp/build/outputs/apk/**. These can be installed and run on emulators or real devices as usual.
 
 For any errors during this process, please refer to the FAQ section.
 
@@ -80,7 +81,7 @@ For any errors during this process, please refer to the FAQ section.
 
 **Note** The supported Android version is 5.0 to 5.1.1
 
-1. Run the **opentee** app and then the **testapp** run-time configurations on a device or emulator. 
+1. Run the **teeservice** app and then the **testapp** run-time configurations on a device or emulator. 
 
 2. When the **testapp** UI is displayed, click the buttons in the following sequence: "CREAT ROOT KEY" -> "INITIALIZE" -> "CREATE DIRECTORY KEY" -> "ENCRYPT DATA" -> "DECRYPT DATA" -> "FINALIZE".
 
@@ -127,20 +128,20 @@ Note that there is already a generated javadoc in **document/teec_java_api.pdf**
 ### Generate the Javadoc
 Generate the java doc using the following command:
 ```shell
-	$ javadoc -doclet com.tarsec.javadoc.pdfdoclet.PDFDoclet -docletpath $PDFDOCLET_UNZIPPED_DIR/pdfdoclet-1.0.3-all.jar -pdf $OUTPUT_FILE_WITH_FULL_PATH $PROJECT_HOME_DIR/opentee-android/otclient/src/main/java/fi/aalto/ssg/opentee/*.* $PROJECT_HOME_DIR/opentee-android/otclient/src/main/java/fi/aalto/ssg/opentee/exception/*.*
+	$ javadoc -doclet com.tarsec.javadoc.pdfdoclet.PDFDoclet -docletpath $PDFDOCLET_UNZIPPED_DIR/pdfdoclet-1.0.3-all.jar -pdf $OUTPUT_FILE_WITH_FULL_PATH $PROJECT_HOME_DIR/opentee-android/otclient/src/main/java/fi/aalto/ssg/teeservice/*.* $PROJECT_HOME_DIR/opentee-android/otclient/src/main/java/fi/aalto/ssg/teeservice/exception/*.*
 ```
 
 
 ## FAQ
 
 #### Missing files under libtee
-This project imports libtee as a submodule. Ensure that **opentee/src/main/jni/libtee** exists. If not, pull the content by using the following command:
+This project imports libtee as a submodule. Ensure that **teeservice/src/main/jni/libtee** exists. If not, pull the content by using the following command:
 ```shell
 	$ git submodule update --init
 ```
 
 #### No output after clicking "generating root key" in testapp
-Since the dependency **OPEN-TEE** can only run up to Android 5.1.1, if you deployed the **opentee** application to an Android phone/emulator which has a version higher than 5.1.1, no output will be displayed.
+Since the dependency **OPEN-TEE** can only run up to Android 5.1.1, if you deployed the **teeservice** application to an Android phone/emulator which has a version higher than 5.1.1, no output will be displayed.
 
 #### Other issues
 For any issues not mentioned above, please report these in the issue tracker.
