@@ -1,0 +1,3 @@
+[submodule "opentee/src/main/jni/libtee"]
+	path = opentee/src/main/jni/libtee
+	url = https://github.com/Open-TEE/libtee.git
