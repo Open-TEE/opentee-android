@@ -5,8 +5,8 @@
 .DS_Store
 /build
 /captures
-opentee/src/main/obj/local/
-opentee/src/main/jni/libtee
-opentee/src/main/libs
+teeservice/src/main/obj/local/
+teeservice/src/main/jni/libtee
+teeservice/src/main/libs
 *~
 *.iml

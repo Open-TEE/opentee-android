@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/opentee" />
             <option value="$PROJECT_DIR$/otclient" />
+            <option value="$PROJECT_DIR$/teeservice" />
             <option value="$PROJECT_DIR$/testapp" />
           </set>
         </option>
@@ -18,6 +19,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/opentee" />
             <option value="$PROJECT_DIR$/otclient" />
+            <option value="$PROJECT_DIR$/teeservice" />
             <option value="$PROJECT_DIR$/testapp" />
           </set>
         </option>
