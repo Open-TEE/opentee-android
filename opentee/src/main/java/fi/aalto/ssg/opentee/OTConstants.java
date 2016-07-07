@@ -33,6 +33,7 @@ public class OTConstants {
     public static final String OPENTEE_SECURE_STORAGE_DIRNAME = ".TEE_secure_storage";
     public static final String OPENTEE_SOCKET_FILENAME = "open_tee_socket";
     public static final String OPENTEE_PID_FILENAME = "opentee-engine.pid";
+    public static final String OPENTEE_RUNTIME_SETTING = "ot_rt_setting.properties";
 
     //lib paths
     public static final String LIB_LAUNCHER_API_ASSET_TEE_NAME = "libLauncherApi.so";

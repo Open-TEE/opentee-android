@@ -35,6 +35,9 @@ public class OT {
             /* install configuration file */
             worker.installConfigToHomeDir(context, OTConstants.OPENTEE_CONF_NAME);
 
+            /* install OT runtime setting file */
+            worker.installConfigToHomeDir(context, OTConstants.OPENTEE_RUNTIME_SETTING);
+
             /* install open-tee */
             worker.installAssetToHomeDir(context, OTConstants.OPENTEE_ENGINE_ASSET_BIN_NAME, OTConstants.OT_BIN_DIR, overwrite);
             worker.installAssetToHomeDir(context, OTConstants.LIB_LAUNCHER_API_ASSET_TEE_NAME, OTConstants.OT_TEE_DIR, overwrite);
@@ -42,7 +45,8 @@ public class OT {
 
             /* install TAs */
             Setting setting = new Setting(mApp.getApplicationContext());
-            String propertiesStr = setting.getProperties().getProperty("TA_List");
+            //String propertiesStr = setting.getProperties().getProperty("TA_List");
+            String propertiesStr = setting.getSetting("TA_List");
             if(propertiesStr == null){
                 Log.e(TAG, "no TA to be deployed!");
             }
@@ -83,4 +87,37 @@ public class OT {
             worker.stopExecutor();
         }
     };
+
+
+    public class InstallTA{
+        Application mApp;
+        String mTAName;
+        byte[] mTAinBytes;
+        boolean mOverwrite = true;
+
+        public InstallTA(Application app, String taName, byte[] ta, boolean overwrite){
+            this.mApp = app;
+            this.mTAName = taName;
+            this.mTAinBytes = ta;
+            this.mOverwrite = overwrite;
+        }
+
+        public Runnable installTATask = new Runnable() {
+            @Override
+            public void run() {
+                Worker worker = new Worker();
+
+                worker.installBytesToHomeDir(mApp.getApplicationContext(),
+                        mTAinBytes,
+                        OTConstants.OT_TA_DIR,
+                        mTAName,
+                        mOverwrite);
+
+                worker.stopExecutor();
+
+                /* update setting */
+
+            }
+        };
+    }
 }

@@ -19,15 +19,18 @@ package fi.aalto.ssg.opentee;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Read setting from "config.properties".
+ * Read setting from "ot_rt_setting.properties" ().
  */
 public class Setting {
     final String TAG = "Setting";
+    String mPropFileName;
     Properties mProp;
 
     public Setting(Context context){
@@ -36,13 +39,21 @@ public class Setting {
             return;
         }
 
-        final String propFileName = "config.properties";
+        try {
+            mPropFileName = OTUtils.getFullPath(context) +
+                            File.separator +
+                            OTConstants.OPENTEE_RUNTIME_SETTING;
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return;
+        }
 
         InputStream inputStream;
         try {
-            inputStream = context.getAssets().open(propFileName);
-        } catch (IOException e) {
-            Log.e(TAG, "unable to read setting from " + propFileName);
+            inputStream = OTUtils.fileToInputStream(mPropFileName);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.e(TAG, mPropFileName + " not found");
             return;
         }
 
@@ -54,6 +65,16 @@ public class Setting {
         }
     }
 
-    public Properties getProperties(){return mProp;}
+    public synchronized void updateSetting(final String settingKey, final String newSetting){
+        mProp.setProperty(settingKey, newSetting);
+    }
+
+    public synchronized String getSetting(final String settingKey){
+        return mProp.getProperty(settingKey);
+    }
+
+    public synchronized void saveSetting(){
+        //TODO:
+    }
 }
 

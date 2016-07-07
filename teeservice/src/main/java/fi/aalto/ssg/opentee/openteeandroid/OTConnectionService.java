@@ -162,6 +162,14 @@ public class OTConnectionService extends Service {
             mOTGuard.teecRequestCancellation(Binder.getCallingPid(),
                     opId);
         }
+
+        @Override
+        public void otInstallTA(byte[] taInBytes) throws RemoteException {
+            Log.d(TAG, Binder.getCallingPid()
+                    + " is calling me to install ta");
+
+            //TODO:
+        }
     }; // end of implementing the IOTConnectionInterface.Stub()
 
     @Override

@@ -51,4 +51,6 @@ interface IOTConnectionInterface {
     int teecInvokeCommand(int sid, int commandId, in byte[] teecOperation, out int[] returnOrigin, in ISyncOperation syncOperation, int opHashCode);
 
     void teecRequestCancellation(int opId);
+
+    void otInstallTA(in byte[] taInBytes);
 }

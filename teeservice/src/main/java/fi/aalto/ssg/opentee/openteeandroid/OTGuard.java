@@ -480,4 +480,8 @@ public class OTGuard {
     private boolean occupiedSid(int id){
         return sessionIdMap.containsKey(id);
     }
+
+    private void otInstallTa(int callerId, byte[] taInBytes){
+        // TODO:
+    }
 }

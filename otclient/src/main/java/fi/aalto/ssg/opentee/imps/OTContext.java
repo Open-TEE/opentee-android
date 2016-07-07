@@ -451,4 +451,11 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
 
         return invokeCommandTask.getReturnValue();
     }
+
+    /* an extra function to install TA to Open-TEE */
+    public void installTA(byte[] taInBytes){
+        if(taInBytes == null || taInBytes.length == 0) Log.e(TAG, "TA is empty. Will not be installed");
+
+        //TODO:
+    }
 }

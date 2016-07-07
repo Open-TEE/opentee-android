@@ -21,6 +21,7 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -175,8 +176,20 @@ public class OTUtils {
             scanner.close();
             return stringBuilder.toString();
         }
+
         Log.e(TAG_CLASS, "no file called: " + fileName);
         return null;
+    }
+
+    public static InputStream fileToInputStream(String fileName) throws FileNotFoundException {
+        File file = new File(fileName);
+
+        if(!file.exists()){
+            Log.e(TAG_CLASS, fileName + " not found.");
+            return null;
+        }
+
+        return new FileInputStream(file);
     }
 
 }

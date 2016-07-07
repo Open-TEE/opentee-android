@@ -264,4 +264,12 @@ public class ProxyApis {
 
         return returnValueWrapper;
     }
+
+    public void otInstallTA(byte[] taInBytes) throws CommunicationErrorException, RemoteException {
+        if( mService == null ){
+            throw new CommunicationErrorException("Service unavailable");
+        }
+
+        mService.otInstallTA(taInBytes);
+    }
 }
