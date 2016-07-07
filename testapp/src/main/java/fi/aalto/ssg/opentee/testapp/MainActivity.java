@@ -16,7 +16,6 @@
 package fi.aalto.ssg.opentee.testapp;
 
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,14 +23,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import java.util.Arrays;
-import java.util.UUID;
-
-import fi.aalto.ssg.opentee.ITEEClient;
-import fi.aalto.ssg.opentee.exception.BadParametersException;
-import fi.aalto.ssg.opentee.exception.TEEClientException;
-import fi.aalto.ssg.opentee.OpenTEE;
 
 public class MainActivity extends AppCompatActivity {
     public final String TAG = "Test_APP";

@@ -1,5 +1,6 @@
-package fi.aalto.ssg.opentee;
+package fi.aalto.ssg.opentee.imps;
 
+import fi.aalto.ssg.opentee.ITEEClient;
 import fi.aalto.ssg.opentee.imps.OTClient;
 
 /**

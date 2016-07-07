@@ -30,7 +30,7 @@ import java.util.Properties;
  */
 public class Setting {
     final String TAG = "Setting";
-    String mPropFileName;
+    String mPropFilePath;
     Properties mProp;
 
     public Setting(Context context){
@@ -40,7 +40,7 @@ public class Setting {
         }
 
         try {
-            mPropFileName = OTUtils.getFullPath(context) +
+            mPropFilePath = OTUtils.getFullPath(context) +
                             File.separator +
                             OTConstants.OPENTEE_RUNTIME_SETTING;
         } catch (IOException | InterruptedException e) {
@@ -50,10 +50,10 @@ public class Setting {
 
         InputStream inputStream;
         try {
-            inputStream = OTUtils.fileToInputStream(mPropFileName);
+            inputStream = OTUtils.fileToInputStream(mPropFilePath);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            Log.e(TAG, mPropFileName + " not found");
+            Log.e(TAG, mPropFilePath + " not found");
             return;
         }
 
@@ -66,15 +66,35 @@ public class Setting {
     }
 
     public synchronized void updateSetting(final String settingKey, final String newSetting){
+        if(mProp == null){
+            Log.e(TAG, "update setting failed: invalid property setting");
+            return;
+        }
         mProp.setProperty(settingKey, newSetting);
     }
 
     public synchronized String getSetting(final String settingKey){
+        if(mProp == null){
+            Log.e(TAG, "get setting failed: invalid property setting");
+            return null;
+        }
         return mProp.getProperty(settingKey);
     }
 
     public synchronized void saveSetting(){
-        //TODO:
+        if(mProp == null){
+            Log.e(TAG, "save setting failed: invalid property setting");
+            return;
+        }
+
+        try {
+            mProp.store(OTUtils.fileToOutputStream(mPropFilePath), null);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "save setting failed.");
+        }
+
+        Log.i(TAG, "setting saved.");
     }
 }
 

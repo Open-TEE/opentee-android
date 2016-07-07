@@ -19,10 +19,9 @@ import android.content.Context;
 import android.util.Log;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 import fi.aalto.ssg.opentee.ITEEClient;
-import fi.aalto.ssg.opentee.OpenTEE;
+import fi.aalto.ssg.opentee.imps.OpenTEE;
 import fi.aalto.ssg.opentee.exception.BadFormatException;
 import fi.aalto.ssg.opentee.exception.BadParametersException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
