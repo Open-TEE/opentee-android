@@ -36,11 +36,9 @@ import fi.aalto.ssg.opentee.exception.ExternalCancelException;
 import fi.aalto.ssg.opentee.exception.GenericErrorException;
 import fi.aalto.ssg.opentee.exception.ItemNotFoundException;
 import fi.aalto.ssg.opentee.exception.NoDataException;
-import fi.aalto.ssg.opentee.exception.NoStorageSpaceException;
 import fi.aalto.ssg.opentee.exception.NotImplementedException;
 import fi.aalto.ssg.opentee.exception.NotSupportedException;
 import fi.aalto.ssg.opentee.exception.OutOfMemoryException;
-import fi.aalto.ssg.opentee.exception.OverflowException;
 import fi.aalto.ssg.opentee.exception.SecurityErrorException;
 import fi.aalto.ssg.opentee.exception.ShortBufferException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
@@ -227,12 +225,8 @@ public class OTFactoryMethods {
                 throw new ShortBufferException("Short buffer");
             case OTReturnCode.TEE_ERROR_EXTERNAL_CANCEL:
                 throw new ExternalCancelException("External cancel");
-            case OTReturnCode.TEE_ERROR_OVERFLOW:
-                throw new OverflowException("Overflow");
             case OTReturnCode.TEE_ERROR_TARGET_DEAD:
                 throw new TargetDeadException("TEE: target dead");
-            case OTReturnCode.TEE_ERROR_STORAGE_NO_SPACE:
-                throw new NoStorageSpaceException("Storage no space");
             default:
                 break;
             //throw new TEEClientException("Unknown error");
@@ -295,12 +289,8 @@ public class OTFactoryMethods {
                 throw new ShortBufferException("Short buffer", returnOriginCode);
             case OTReturnCode.TEE_ERROR_EXTERNAL_CANCEL:
                 throw new ExternalCancelException("External cancel", returnOriginCode);
-            case OTReturnCode.TEE_ERROR_OVERFLOW:
-                throw new OverflowException("Overflow", returnOriginCode);
             case OTReturnCode.TEE_ERROR_TARGET_DEAD:
                 throw new TargetDeadException("TEE: target dead", returnOriginCode);
-            case OTReturnCode.TEE_ERROR_STORAGE_NO_SPACE:
-                throw new NoStorageSpaceException("Storage no space", returnOriginCode);
             default:
                 break;
             //throw new TEEClientException("Unknown error", returnOriginCode);

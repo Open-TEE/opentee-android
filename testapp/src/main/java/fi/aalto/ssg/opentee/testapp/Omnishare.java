@@ -85,14 +85,14 @@ public class Omnishare {
 
         ITEEClient.IRegisteredMemoryReference rmr = null;
         try {
-            rmr = client.newRegisteredMemoryReference(sm,
+            rmr = client.RegisteredMemoryReference(sm,
                             ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_OUTPUT,
                             0);
         } catch (BadParametersException e) {
             e.printStackTrace();
         }
 
-        ITEEClient.IOperation op = client.newOperation(rmr);
+        ITEEClient.IOperation op = client.Operation(rmr);
 
         int CMD_CREATE_ROOT_KEY = 0x00000001;
 
@@ -167,14 +167,14 @@ public class Omnishare {
 
         ITEEClient.IRegisteredMemoryReference rmr = null;
         try {
-            rmr = client.newRegisteredMemoryReference(sm,
+            rmr = client.RegisteredMemoryReference(sm,
                             ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT,
                             0);
         } catch (BadParametersException e) {
             e.printStackTrace();
         }
 
-        ITEEClient.IOperation op = client.newOperation(rmr);
+        ITEEClient.IOperation op = client.Operation(rmr);
 
         ITEEClient.ISession ses = null;
         try {
@@ -257,7 +257,7 @@ public class Omnishare {
         ITEEClient.IRegisteredMemoryReference desRmr = null;
         ITEEClient.IRegisteredMemoryReference keyRmr = null;
 
-        ITEEClient.IValue val = client.newValue(ITEEClient.IValue.Flag.TEEC_VALUE_INPUT, opCmd.var, 0);
+        ITEEClient.IValue val = client.Value(ITEEClient.IValue.Flag.TEEC_VALUE_INPUT, opCmd.var, 0);
 
         ITEEClient.ISharedMemory srcSm = null;
         if(opCmd == CRYPTO_OP.CRYPTO_ENC_FILE || opCmd == CRYPTO_OP.CRYPTO_DEC_FILE){
@@ -270,7 +270,7 @@ public class Omnishare {
                 return null;
             }
 
-            srcRmr = client.newRegisteredMemoryReference(srcSm, ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT, 0);
+            srcRmr = client.RegisteredMemoryReference(srcSm, ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT, 0);
         }
 
         ITEEClient.ISharedMemory keySm = null;
@@ -294,7 +294,7 @@ public class Omnishare {
                 return null;
             }
 
-            keyRmr = client.newRegisteredMemoryReference(keySm,
+            keyRmr = client.RegisteredMemoryReference(keySm,
                     ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_INPUT,
                     0);
         }
@@ -325,11 +325,11 @@ public class Omnishare {
             return null;
         }
 
-        desRmr = client.newRegisteredMemoryReference(desSm,
+        desRmr = client.RegisteredMemoryReference(desSm,
                 ITEEClient.IRegisteredMemoryReference.Flag.TEEC_MEMREF_OUTPUT,
                 0);
 
-        op = client.newOperation(keyRmr, val, srcRmr, desRmr);
+        op = client.Operation(keyRmr, val, srcRmr, desRmr);
 
         int CMD_DO_CRYPTO = 0X00000002;
         try {

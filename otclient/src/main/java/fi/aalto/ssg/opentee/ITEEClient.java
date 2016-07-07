@@ -19,7 +19,7 @@ import fi.aalto.ssg.opentee.exception.TEEClientException;
 public interface ITEEClient {
 
     /**
-     * This interface defines the way to interact with an <code>Operation</code> which is a wrapper class for
+     * This interface defines the way to interact with an <code>Operation</code> which is a wrapper interface for
      * 0 to 4 <code>IParameter</code>(s). It can be created only by calling the function <code>newOperation</code>.
      * After a valid <code>IOperation</code> interface is returned, developers can refer to the corresponding <code>Operation</code>
      * in either <code>openSession</code> or <code>invokeCommand</code> function calls.
@@ -52,7 +52,7 @@ public interface ITEEClient {
      * a method to create an operation without parameter.
      * @return an <code>IOperation</code> interface for created operation.
      */
-    IOperation newOperation();
+    IOperation Operation();
 
     /**
      * a method to create an operation with one parameter.
@@ -64,7 +64,7 @@ public interface ITEEClient {
      * @param firstParam the first <code>IParameter</code>.
      * @return an <code>IOperation</code> interface for created operation.
      */
-    IOperation newOperation(IParameter firstParam);
+    IOperation Operation(IParameter firstParam);
 
     /**
      * a method to create an operation with two parameters.
@@ -75,7 +75,7 @@ public interface ITEEClient {
      * @param secondParam the second <code>IParameter</code>.
      * @return an <code>IOperation</code> interface for created operation.
      */
-    IOperation newOperation(IParameter firstParam, IParameter secondParam);
+    IOperation Operation(IParameter firstParam, IParameter secondParam);
 
     /**
      * a method to create an operation with three parameters.
@@ -84,7 +84,7 @@ public interface ITEEClient {
      * @param thirdParam the third <code>IParameter</code>.
      * @return an <code>IOperation</code> interface for created operation.
      */
-    IOperation newOperation(IParameter firstParam, IParameter secondParam, IParameter thirdParam);
+    IOperation Operation(IParameter firstParam, IParameter secondParam, IParameter thirdParam);
 
     /**
      * a method to create an operation with four parameters.
@@ -94,11 +94,11 @@ public interface ITEEClient {
      * @param forthParam the forth <code>IParameter</code>.
      * @return an <code>IOperation</code> interface for created Operation.
      */
-    IOperation newOperation(IParameter firstParam, IParameter secondParam, IParameter thirdParam, IParameter forthParam);
+    IOperation Operation(IParameter firstParam, IParameter secondParam, IParameter thirdParam, IParameter forthParam);
 
 
     /**
-     * <code>IParameter</code> interface is the super class of <code>IRegisteredMemoryReference</code> and <code>IValue</code> interfaces,
+     * <code>IParameter</code> interface is the super interface of <code>IRegisteredMemoryReference</code> and <code>IValue</code> interfaces,
      * It can passed into the <code>newOperation</code> to create an <code>IOperation</code> interface. It is possible
      * to share the <code>IParameter</code> interface between different threads. Developers should be ware of the race condition
      * when accessing the same <code>IParameter</code>. It is also their responsibilities to handle such a scenario.
@@ -195,7 +195,7 @@ public interface ITEEClient {
      * @param flag the flag for referenced shared memory.
      * @param offset the offset from the beginning of the buffer of shared memory.
      */
-    IRegisteredMemoryReference newRegisteredMemoryReference(ISharedMemory sharedMemory, IRegisteredMemoryReference.Flag flag, int offset) throws BadParametersException;
+    IRegisteredMemoryReference RegisteredMemoryReference(ISharedMemory sharedMemory, IRegisteredMemoryReference.Flag flag, int offset) throws BadParametersException;
 
     /**
      * Interface to access a pair of two integer values. It can be only obtained by calling the
@@ -243,7 +243,7 @@ public interface ITEEClient {
      * @param b The second integer value.
      * @return an <code>IValue</code> interface.
      */
-    IValue newValue(IValue.Flag flag, int a, int b);
+    IValue Value(IValue.Flag flag, int a, int b);
 
     /**
      * For a CA to communicate with a TA within a TEE, a session must be opened between the CA and TA.

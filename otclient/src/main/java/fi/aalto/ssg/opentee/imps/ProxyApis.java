@@ -20,47 +20,19 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.ParcelUuid;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
-
-import javax.net.ssl.HandshakeCompletedListener;
 
 import fi.aalto.ssg.opentee.IOTConnectionInterface;
 import fi.aalto.ssg.opentee.ISyncOperation;
 import fi.aalto.ssg.opentee.ITEEClient;
-import fi.aalto.ssg.opentee.exception.AccessConflictException;
-import fi.aalto.ssg.opentee.exception.AccessDeniedException;
-import fi.aalto.ssg.opentee.exception.BadFormatException;
-import fi.aalto.ssg.opentee.exception.BadParametersException;
-import fi.aalto.ssg.opentee.exception.BadStateException;
-import fi.aalto.ssg.opentee.exception.BusyException;
-import fi.aalto.ssg.opentee.exception.CancelErrorException;
 import fi.aalto.ssg.opentee.exception.CommunicationErrorException;
-import fi.aalto.ssg.opentee.exception.ExcessDataException;
-import fi.aalto.ssg.opentee.exception.ExternalCancelException;
 import fi.aalto.ssg.opentee.exception.GenericErrorException;
-import fi.aalto.ssg.opentee.exception.ItemNotFoundException;
-import fi.aalto.ssg.opentee.exception.NoDataException;
-import fi.aalto.ssg.opentee.exception.NoStorageSpaceException;
-import fi.aalto.ssg.opentee.exception.NotImplementedException;
-import fi.aalto.ssg.opentee.exception.NotSupportedException;
-import fi.aalto.ssg.opentee.exception.OutOfMemoryException;
-import fi.aalto.ssg.opentee.exception.OverflowException;
-import fi.aalto.ssg.opentee.exception.SecurityErrorException;
-import fi.aalto.ssg.opentee.exception.ShortBufferException;
 import fi.aalto.ssg.opentee.exception.TEEClientException;
-import fi.aalto.ssg.opentee.exception.TargetDeadException;
-import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 
 /**
  * This class handles the communication with the service on behalf of the Client Application.
