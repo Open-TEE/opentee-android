@@ -47,7 +47,6 @@ public class OT {
 
             /* install TAs */
             Setting setting = new Setting(mApp.getApplicationContext());
-            //String propertiesStr = setting.getProperties().getProperty("TA_List");
             String propertiesStr = setting.getSetting(TA_LIST);
             if(propertiesStr == null){
                 Log.e(TAG, "no TA to be deployed!");

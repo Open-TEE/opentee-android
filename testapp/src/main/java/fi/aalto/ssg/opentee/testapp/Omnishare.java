@@ -18,6 +18,7 @@ package fi.aalto.ssg.opentee.testapp;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import fi.aalto.ssg.opentee.IOTUtils;
@@ -36,6 +37,8 @@ public class Omnishare {
 
     public static final String TAG = "Omnishare";
 
+    public static final String OMNISHARE_TA = "libomnishare_ta.so";
+
     public static synchronized boolean generateRootKey(byte[] key, Context context, WorkerCallback callback){
         if(key == null || key.length == 0 || callback == null) return false;
 
@@ -50,16 +53,17 @@ public class Omnishare {
         }
 
         /* push OmniShare TA to Open-TEE */
-        //TODO:
-        IOTUtils oTUtils = (IOTUtils)ctx;
-        byte[] taInBytes = {0x30, 0x31, 0x32, 0x33};
+        IOTUtils utils = (IOTUtils)ctx;
         try {
-            oTUtils.installTA("test.so", taInBytes);
+            if( !utils.installTA(OMNISHARE_TA) ){
+                Log.e(TAG, "Install " + OMNISHARE_TA + " failed.");
+                return false;
+            }
         } catch (CommunicationErrorException e) {
             e.printStackTrace();
-            Log.e(TAG, "Failed to install TA");
             return false;
         }
+
 
         ITEEClient.ISession ses = null;
         try {

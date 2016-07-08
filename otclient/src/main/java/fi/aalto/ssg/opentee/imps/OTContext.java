@@ -19,6 +19,10 @@ import android.content.Context;
 import android.os.RemoteException;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -475,5 +479,41 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback, IOTUti
         } catch (CommunicationErrorException | RemoteException e) {
             throw new CommunicationErrorException(e.toString());
         }
+    }
+
+    @Override
+    public boolean installTA(String taFileName) throws CommunicationErrorException {
+        if(taFileName == null || taFileName.length() == 0){
+            Log.e(TAG, "Invalid ta file name.");
+            return false;
+        }
+
+        /* read ta to byte array */
+        String libPath = mContext.getApplicationInfo().dataDir + File.separator + "lib";
+        String taPath = libPath + File.separator + taFileName;
+
+        InputStream i;
+        try {
+            i = OTUtils.fileToInputStream(taPath);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        if(i == null) return false;
+
+        byte[] taInBytes ;
+        try {
+            taInBytes = OTUtils.readBytesFromInputStream(i);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        if(taInBytes == null) return false;
+
+        installTA(taFileName, taInBytes);
+
+        return true;
     }
 }

@@ -224,48 +224,51 @@ public class Worker {
      */
     public void installConfigToHomeDir(final Context context,
                                        final String configName){
+        try {
+            String destPath = OTUtils.getFullPath(context) + File.separator + configName;
+
+
+            File configFile = new File(destPath);
+            if (!configFile.exists()) {
+                /**
+                 * copy the configuration file from the asset folder and change its content in the fly;
+                 */
+                BufferedReader reader = new BufferedReader(new InputStreamReader(
+                        context.getAssets().open(configName), CONF_ENCODING_STYLE)
+                );
+
+                PrintWriter printWriter = new PrintWriter(configFile, CONF_ENCODING_STYLE);
+                String line = "";
+                String appHomePath = OTUtils.getFullPath(context);
+                while ((line = reader.readLine()) != null) {
+                    //replace the PLACEHOLDER with the actual app home directory
+                    line = line.replaceAll("\\b" + OTConstants.OPENTEE_DIR_CONF_PLACEHOLDER + "\\b", appHomePath);
+                    printWriter.println(line);
+                }
+                printWriter.close();
+
+                /**
+                 * change the mod of the configuration to 640
+                 */
+                String commandOutput = OTUtils.execUnixCommand(("/system/bin/chmod 640 " + destPath).split(" "), null);
+                Log.d(TAG_CLASS, "/system/bin/chmod 640 " + destPath);
+                Log.d(TAG_CLASS, commandOutput);
+
+            }
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+/*
         if ( mExecutor != null ){
             mExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        String destPath = OTUtils.getFullPath(context) + File.separator + configName;
 
-
-                        File configFile = new File(destPath);
-                        if (!configFile.exists()) {
-                            /**
-                             * copy the configuration file from the asset folder and change its content in the fly;
-                             */
-                            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                                    context.getAssets().open(configName), CONF_ENCODING_STYLE)
-                            );
-
-                            PrintWriter printWriter = new PrintWriter(configFile, CONF_ENCODING_STYLE);
-                            String line = "";
-                            String appHomePath = OTUtils.getFullPath(context);
-                            while ((line = reader.readLine()) != null) {
-                                //replace the PLACEHOLDER with the actual app home directory
-                                line = line.replaceAll("\\b" + OTConstants.OPENTEE_DIR_CONF_PLACEHOLDER + "\\b", appHomePath);
-                                printWriter.println(line);
-                            }
-                            printWriter.close();
-
-                            /**
-                             * change the mod of the configuration to 640
-                             */
-                            String commandOutput = OTUtils.execUnixCommand(("/system/bin/chmod 640 " + destPath).split(" "), null);
-                            Log.d(TAG_CLASS, "/system/bin/chmod 640 " + destPath);
-                            Log.d(TAG_CLASS, commandOutput);
-
-                        }
-
-                    } catch (IOException | InterruptedException e) {
-                        e.printStackTrace();
-                    }
                 }
             });
         }
+*/
     }
 
     public void startOpenTEEEngine(final Context context) throws IOException, InterruptedException {

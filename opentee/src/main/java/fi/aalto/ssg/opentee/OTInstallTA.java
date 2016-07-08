@@ -42,18 +42,30 @@ public class OTInstallTA{
 
             // add new TA name to the old list if it is not existed.
             String propertiesStr = setting.getSetting(OT.TA_LIST);
-            List<String> taList = Arrays.asList( propertiesStr.split(",") );
-
-            if(!taList.contains(mTAName)) {
-                propertiesStr += "," + mTAName;
+            if(propertiesStr == null || propertiesStr.length() == 0){
+                // no TA set yet.
+                propertiesStr = mTAName;
 
                 // update and save setting.
                 setting.updateSetting(OT.TA_LIST, propertiesStr);
                 setting.saveSetting();
 
                 Log.i(TAG, mTAName + " added.");
-            }else{
-                Log.i(TAG, mTAName + " already existed. So will not be added and only update its binary.");
+            }
+            else {
+                List<String> taList = Arrays.asList(propertiesStr.split(","));
+
+                if (!taList.contains(mTAName)) {
+                    propertiesStr += "," + mTAName;
+
+                    // update and save setting.
+                    setting.updateSetting(OT.TA_LIST, propertiesStr);
+                    setting.saveSetting();
+
+                    Log.i(TAG, mTAName + " added.");
+                } else {
+                    Log.i(TAG, mTAName + " already existed. So will not be added and only update its binary.");
+                }
             }
         }
     };
