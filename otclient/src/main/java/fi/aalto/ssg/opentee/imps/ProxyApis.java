@@ -237,11 +237,11 @@ public class ProxyApis {
         return returnValueWrapper;
     }
 
-    public void otInstallTA(byte[] taInBytes) throws CommunicationErrorException, RemoteException {
+    public void otInstallTA(String taName, byte[] taInBytes) throws CommunicationErrorException, RemoteException {
         if( mService == null ){
             throw new CommunicationErrorException("Service unavailable");
         }
 
-        mService.otInstallTA(taInBytes);
+        mService.otInstallTA(taName, taInBytes);
     }
 }

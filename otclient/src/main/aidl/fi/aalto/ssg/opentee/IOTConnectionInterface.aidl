@@ -52,5 +52,5 @@ interface IOTConnectionInterface {
 
     void teecRequestCancellation(int opId);
 
-    void otInstallTA(in byte[] taInBytes);
+    void otInstallTA(in String taName, in byte[] taInBytes);
 }

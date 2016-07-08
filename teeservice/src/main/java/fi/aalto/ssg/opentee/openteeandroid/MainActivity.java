@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
         /* active the installation task */
         this.mOT = new OT(getApplication());
         handler.post(mOT.installationTask);
-
     }
 
     @Override

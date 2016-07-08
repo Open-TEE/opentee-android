@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import fi.aalto.ssg.opentee.IOTUtils;
 import fi.aalto.ssg.opentee.ITEEClient;
 import fi.aalto.ssg.opentee.exception.BadFormatException;
 import fi.aalto.ssg.opentee.exception.BadParametersException;
@@ -39,7 +40,7 @@ import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 /**
  * This class implements the IContext interface
  */
-public class OTContext implements ITEEClient.IContext, OTContextCallback {
+public class OTContext implements ITEEClient.IContext, OTContextCallback, IOTUtils {
     final String TAG = "OTContext";
 
     String mTeeName = null;
@@ -452,10 +453,27 @@ public class OTContext implements ITEEClient.IContext, OTContextCallback {
         return invokeCommandTask.getReturnValue();
     }
 
-    /* an extra function to install TA to Open-TEE */
-    public void installTA(byte[] taInBytes){
-        if(taInBytes == null || taInBytes.length == 0) Log.e(TAG, "TA is empty. Will not be installed");
+    @Override
+    public void installTA(String taName, byte[] taInBytes) throws CommunicationErrorException {
+        if(taName == null || taName.length() == 0) {
+            Log.e(TAG, "TA name is empty. Will not be installed");
+            return;
+        }
 
-        //TODO:
+        if(taInBytes == null || taInBytes.length == 0){
+            Log.e(TAG, "TA is empty. Will not be installed");
+            return;
+        }
+
+        if ( !mInitialized || mProxyApis == null ){
+            Log.e(TAG, "No service available");
+            return;
+        }
+
+        try {
+            mProxyApis.otInstallTA(taName, taInBytes);
+        } catch (CommunicationErrorException | RemoteException e) {
+            throw new CommunicationErrorException(e.toString());
+        }
     }
 }

@@ -20,7 +20,10 @@ import android.util.Log;
 
 import java.util.Arrays;
 
+import fi.aalto.ssg.opentee.IOTUtils;
 import fi.aalto.ssg.opentee.ITEEClient;
+import fi.aalto.ssg.opentee.exception.CommunicationErrorException;
+import fi.aalto.ssg.opentee.imps.OTContext;
 import fi.aalto.ssg.opentee.imps.OpenTEE;
 import fi.aalto.ssg.opentee.exception.BadFormatException;
 import fi.aalto.ssg.opentee.exception.BadParametersException;
@@ -43,6 +46,18 @@ public class Omnishare {
             ctx = client.initializeContext(null, context);
         } catch (TEEClientException e) {
             e.printStackTrace();
+            return false;
+        }
+
+        /* push OmniShare TA to Open-TEE */
+        //TODO:
+        IOTUtils oTUtils = (IOTUtils)ctx;
+        byte[] taInBytes = {0x30, 0x31, 0x32, 0x33};
+        try {
+            oTUtils.installTA("test.so", taInBytes);
+        } catch (CommunicationErrorException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Failed to install TA");
             return false;
         }
 

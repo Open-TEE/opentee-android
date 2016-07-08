@@ -15,7 +15,10 @@
  */
 package fi.aalto.ssg.opentee.openteeandroid;
 
+import android.app.Application;
 import android.content.Context;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -23,6 +26,8 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import fi.aalto.ssg.opentee.ISyncOperation;
+import fi.aalto.ssg.opentee.OT;
+import fi.aalto.ssg.opentee.OTInstallTA;
 import fi.aalto.ssg.opentee.OTUtils;
 import fi.aalto.ssg.opentee.imps.OTFactoryMethods;
 import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
@@ -443,6 +448,16 @@ public class OTGuard {
         t.start();
     }
 
+    public void otInstallTa(Context context, int callerId, String taName, byte[] taInBytes){
+        HandlerThread installTAWorker = new HandlerThread("install_TA_Worker");
+        installTAWorker.start();
+
+        Handler workerHandler = new Handler(installTAWorker.getLooper());
+        OTInstallTA installTA = new OTInstallTA(context, taName, taInBytes, true);
+
+        workerHandler.post(installTA.installTATask);
+    }
+
     private OTCaller findCallerById(int callerId){
         return mOTCallerList.get(callerId);
     }
@@ -479,9 +494,5 @@ public class OTGuard {
 
     private boolean occupiedSid(int id){
         return sessionIdMap.containsKey(id);
-    }
-
-    private void otInstallTa(int callerId, byte[] taInBytes){
-        // TODO:
     }
 }

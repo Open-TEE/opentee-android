@@ -164,11 +164,11 @@ public class OTConnectionService extends Service {
         }
 
         @Override
-        public void otInstallTA(byte[] taInBytes) throws RemoteException {
+        public void otInstallTA(String taName, byte[] taInBytes) throws RemoteException {
             Log.d(TAG, Binder.getCallingPid()
-                    + " is calling me to install ta");
+                    + " is calling me to install ta:" + taName);
 
-            //TODO:
+            mOTGuard.otInstallTa(getApplicationContext(), Binder.getCallingPid(), taName, taInBytes);
         }
     }; // end of implementing the IOTConnectionInterface.Stub()
 

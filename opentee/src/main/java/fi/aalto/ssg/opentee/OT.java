@@ -12,6 +12,8 @@ import java.io.IOException;
 public class OT {
     final String TAG = "Open-TEE";
 
+    public static final String TA_LIST = "TA_List";
+
     Application mApp;
 
     public OT(Application app){
@@ -46,7 +48,7 @@ public class OT {
             /* install TAs */
             Setting setting = new Setting(mApp.getApplicationContext());
             //String propertiesStr = setting.getProperties().getProperty("TA_List");
-            String propertiesStr = setting.getSetting("TA_List");
+            String propertiesStr = setting.getSetting(TA_LIST);
             if(propertiesStr == null){
                 Log.e(TAG, "no TA to be deployed!");
             }
@@ -87,37 +89,4 @@ public class OT {
             worker.stopExecutor();
         }
     };
-
-
-    public class InstallTA{
-        Application mApp;
-        String mTAName;
-        byte[] mTAinBytes;
-        boolean mOverwrite = true;
-
-        public InstallTA(Application app, String taName, byte[] ta, boolean overwrite){
-            this.mApp = app;
-            this.mTAName = taName;
-            this.mTAinBytes = ta;
-            this.mOverwrite = overwrite;
-        }
-
-        public Runnable installTATask = new Runnable() {
-            @Override
-            public void run() {
-                Worker worker = new Worker();
-
-                worker.installBytesToHomeDir(mApp.getApplicationContext(),
-                        mTAinBytes,
-                        OTConstants.OT_TA_DIR,
-                        mTAName,
-                        mOverwrite);
-
-                worker.stopExecutor();
-
-                /* update setting */
-                // TODO:
-            }
-        };
-    }
 }
