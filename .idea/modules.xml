@@ -6,7 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/teeservice/opentee.iml" filepath="$PROJECT_DIR$/teeservice/opentee.iml" />
       <module fileurl="file://$PROJECT_DIR$/opentee-android.iml" filepath="$PROJECT_DIR$/opentee-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/otclient/otclient.iml" filepath="$PROJECT_DIR$/otclient/otclient.iml" />
-      <module fileurl="file://$PROJECT_DIR$/teeservice/teeservice.iml" filepath="$PROJECT_DIR$/teeservice/teeservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/otservice/teeservice.iml" filepath="$PROJECT_DIR$/otservice/teeservice.iml" />
       <module fileurl="file://$PROJECT_DIR$/testapp/testapp.iml" filepath="$PROJECT_DIR$/testapp/testapp.iml" />
     </modules>
   </component>
