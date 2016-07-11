@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import fi.aalto.ssg.opentee.IOTUtils;
+import fi.aalto.ssg.opentee.IContextUtils;
 import fi.aalto.ssg.opentee.ITEEClient;
 import fi.aalto.ssg.opentee.exception.BadFormatException;
 import fi.aalto.ssg.opentee.exception.BadParametersException;
@@ -44,7 +44,7 @@ import fi.aalto.ssg.opentee.imps.pbdatatypes.GPDataTypes;
 /**
  * This class implements the IContext interface
  */
-public class OTContext implements ITEEClient.IContext, OTContextCallback, IOTUtils {
+public class OTContext implements ITEEClient.IContext, OTContextCallback, IContextUtils {
     final String TAG = "OTContext";
 
     String mTeeName = null;
