@@ -142,6 +142,7 @@ Make sure that your TA is not rejected by the Open-TEE which can be easily spote
 ```shell
 E/tee_manager: Open-TEE/emulator/manager/ta_dir_watch.c:add_new_ta:227  TA "incorrectTAExample.so" rejected
 ```
+The rejected TA will not be started by Open-TEE. You can take the correct example TA from <https://github.com/Open-TEE/TAs>.
 
 
 ## Update Open-TEE
