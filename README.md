@@ -10,9 +10,9 @@ This repository consists of the following directories:
 
 - **opentee**: has [Open-TEE](https://open-tee.github.io) along with utility functions to use Open-TEE in Android.
 
-- **otclient**: contains the Java API (OT-J) and an implementation of this API using Open-TEE. Android Client Applications (CAs) must import this module in order to interact with the **teeservice** module.
+- **otclient**: contains the Java API (OT-J) and an implementation of this API using Open-TEE. Android Client Applications (CAs) must import this module in order to interact with the **otservice** module.
 
-- **teeservice**: contains
+- **otservice**: contains
 	* TEE Proxy Service
 	* NativeLibtee
 	* Libtee
@@ -51,7 +51,7 @@ Clone this repository:
 ### Build with Android Studio
 1. Import **opentee-android** into Android Studio. Go to **File->New->Import Project...** and select the **opentee-android** under the **opentee-android-test** directory. Wait for Android Studio to finish the import task.
 2. You need either an Android device or an Android emulator to run our test application. To set up a debugging environment, follow the instructions at: https://developer.android.com/studio/run/index.html
-3. Run **teeservice** run-time configuration by selecting the teeservice from the drop-down list on the left side of the **Run** button. Click the **Run** button and select your target device, which can be either a real Android device or an emulator.
+3. Run **otservice** run-time configuration by selecting the otservice from the drop-down list on the left side of the **Run** button. Click the **Run** button and select your target device, which can be either a real Android device or an emulator.
 4. Follow the same steps as above to run the **testapp** run-time configuration.
 
 For any errors during this process, please refer to the **FAQ** section.
@@ -69,7 +69,7 @@ It is assumed that you have already installed the Android SDK and NDK (see prere
 	$ ./gradlew assembleDebug
 ```
 
-After successful compilation, the output will be two .apk files located in folder **teeservice/build/outputs/apk/** and **testapp/build/outputs/apk/**. These can be installed and run on emulators or real devices as usual.
+After successful compilation, the output will be two .apk files located in folder **otservice/build/outputs/apk/** and **testapp/build/outputs/apk/**. These can be installed and run on emulators or real devices as usual.
 
 For any errors during this process, please refer to the FAQ section.
 
@@ -81,7 +81,7 @@ For any errors during this process, please refer to the FAQ section.
 
 **Note** The supported Android version is 5.0 to 5.1.1
 
-1. Run the **teeservice** app and then the **testapp** run-time configurations on a device or emulator. 
+1. Run the **otservice** app and then the **testapp** run-time configurations on a device or emulator. 
 
 2. When the **testapp** UI is displayed, click the buttons in the following sequence: "CREAT ROOT KEY" -> "INITIALIZE" -> "CREATE DIRECTORY KEY" -> "ENCRYPT DATA" -> "DECRYPT DATA" -> "FINALIZE".
 
@@ -89,6 +89,8 @@ For any errors during this process, please refer to the FAQ section.
 
 
 ### Running other TAs
+#### Method 1 - install TA along with Open-TEE
+The following steps describe how to install TAs during the installation of the Open-TEE.
 
 1. Copy the new TAs into **opentee/src/main/assets/$abi_version**.
 
@@ -106,6 +108,41 @@ I/TEE Proxy Service: installing TA:ta_2.so
 I/TEE Proxy Service: installing TA:ta_3.so
 I/TEE Proxy Service: -----------------------------------------
 ```
+
+
+#### Method 2 - install TA from CA
+This method can allow CA to install TAs to remote Open-TEE even Open-TEE is running.
+
+**Note**: If you uninstall the TEE Proxy service application, you have to install the TAs again. What's more, install TA before open a session to it.
+
+This method is introduced by the **IContextUtils** interface which accepts the TA either coming with a form of a byte array or put under the application **lib** directory. Be aware that the **IContextUtils** is an Open-TEE specific interface which is not included in the Java API that we have proposed.
+
+To use the utility functions that **IContextUtils** provides, the CA must have a valid **IContext** interface. Since the class which implements the **IContext** interface also implements the **IContextUtils** inteface, a valid **IContextUtils** can be retreived by just casting the **IContext** interface like the following code.
+```Java
+IContextUtils utils = (IContextUtils)ctx;
+```
+
+```Java
+try {
+    // install TA under application lib directory by simply using its name.
+    if( !utils.installTA("ta_name.so") ){
+        Log.e(TAG, "Install " + OMNISHARE_TA + " failed.");
+    }
+
+    // install TA in the form of byte array.
+    utils.installTA("ta_name.so", ta_in_bytes);
+
+} catch (CommunicationErrorException e) {
+    // handle exception here.
+}
+```
+
+
+Make sure that your TA is not rejected by the Open-TEE which can be easily spoted in the log message from the Open-TEE. If error happened, you can see similar error msg as follows:
+```shell
+E/tee_manager: Open-TEE/emulator/manager/ta_dir_watch.c:add_new_ta:227  TA "incorrectTAExample.so" rejected
+```
+
 
 ## Update Open-TEE
 
@@ -135,13 +172,13 @@ Generate the java doc using the following command:
 ## FAQ
 
 #### Missing files under libtee
-This project imports libtee as a submodule. Ensure that **teeservice/src/main/jni/libtee** exists. If not, pull the content by using the following command:
+This project imports libtee as a submodule. Ensure that **otservice/src/main/jni/libtee** exists. If not, pull the content by using the following command:
 ```shell
 	$ git submodule update --init
 ```
 
 #### No output after clicking "generating root key" in testapp
-Since the dependency **OPEN-TEE** can only run up to Android 5.1.1, if you deployed the **teeservice** application to an Android phone/emulator which has a version higher than 5.1.1, no output will be displayed.
+Since the dependency **OPEN-TEE** can only run up to Android 5.1.1, if you deployed the **otservice** application to an Android phone/emulator which has a version higher than 5.1.1, no output will be displayed.
 
 #### Other issues
 For any issues not mentioned above, please report these in the issue tracker.

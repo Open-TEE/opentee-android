@@ -264,7 +264,6 @@ public class Omnishare {
     private static byte[] omnishareDoCrypto(ITEEClient client, ITEEClient.IContext ctx, ITEEClient.ISession ses, byte[] keyChain, int keyCount, int keyLen, CRYPTO_OP opCmd, byte[] src, byte[] des) throws BadFormatException, BadParametersException {
         if(client == null || ctx == null || ses == null ||
            opCmd == null ||
-           //src == null || src.length == 0 ||
            des == null || des.length == 0) throw new BadFormatException("incorrect input parameters.");
 
         ITEEClient.IOperation op = null;
