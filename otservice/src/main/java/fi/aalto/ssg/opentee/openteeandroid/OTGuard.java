@@ -437,6 +437,11 @@ public class OTGuard {
     }
 
     public void teecRequestCancellation(final int callerId, final int opId){
+        if(findCallerById(callerId) == null){
+            Log.e(TAG, "unknown caller. Request cancellation abort!");
+            return;
+        }
+
         // needed to be dealing within another thread.
         Thread t = new Thread(new Runnable() {
             @Override
@@ -449,6 +454,11 @@ public class OTGuard {
     }
 
     public void otInstallTa(Context context, int callerId, String taName, byte[] taInBytes){
+        if(findCallerById(callerId) == null){
+            Log.e(TAG, "unkown caller. Install TA abort!");
+            return;
+        }
+
         HandlerThread installTAWorker = new HandlerThread("install_TA_Worker");
         installTAWorker.start();
 
@@ -461,7 +471,6 @@ public class OTGuard {
     private OTCaller findCallerById(int callerId){
         return mOTCallerList.get(callerId);
     }
-
 
     /*  there is need to regenerate the id for the shared memory since different applications may
         send the shared memory with the same id which is identical in ther context while not in OTGuard.
