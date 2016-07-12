@@ -183,7 +183,7 @@ public class OTUtils {
         return null;
     }
 
-    public static InputStream fileToInputStream(String fileName) throws FileNotFoundException {
+    public static InputStream fileToInputStream(final String fileName) throws FileNotFoundException {
         File file = new File(fileName);
 
         if(!file.exists()){
@@ -194,8 +194,13 @@ public class OTUtils {
         return new FileInputStream(file);
     }
 
-    public static OutputStream fileToOutputStream(String fileName) throws FileNotFoundException {
+    public static OutputStream fileToOutputStream(final String fileName) throws FileNotFoundException {
         return new FileOutputStream(new File(fileName));
+    }
+
+    public static String createDirInHome(Context context, final String subDir) throws IOException, InterruptedException {
+        File tmpFile = checkAndCreateDir(context.getApplicationInfo().dataDir + File.separator + subDir);
+        return tmpFile.getAbsolutePath();
     }
 
 }

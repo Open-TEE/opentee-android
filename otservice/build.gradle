@@ -13,7 +13,6 @@ android {
 
         ndk{
             moduleName "nativelibtee"
-            //stl "stlport_static"
         }
     }
 

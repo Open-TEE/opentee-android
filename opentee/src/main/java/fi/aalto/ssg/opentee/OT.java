@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -50,6 +51,16 @@ public class OT {
             String propertiesStr = setting.getSetting(TA_LIST);
             if(propertiesStr == null){
                 Log.e(TAG, "no TA to be deployed!");
+
+                // still create TA folder. Otherwise, Open-TEE will report it as an error.
+                try {
+                    OTUtils.createDirInHome(context, OTConstants.OT_DIR_NAME + File.separator + OTConstants.OT_TA_DIR);
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+
+                    Log.e(TAG, "Unable to create TA folder, installation abort!");
+                    return;
+                }
             }
             else{
                 Log.i(TAG, "-------- begin installing TAs -----------");
