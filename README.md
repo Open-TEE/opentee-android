@@ -81,11 +81,17 @@ For any errors during this process, please refer to the FAQ section.
 
 **Note** The supported Android version is 5.0 to 5.1.1
 
-1. Run the **otservice** app and then the **testapp** run-time configurations on a device or emulator. 
+#### Manually
+1. Run the **otservice** app and then the **testapp** run-time configurations on a device or emulator;
 
-2. When the **testapp** UI is displayed, click the buttons in the following sequence: "CREAT ROOT KEY" -> "INITIALIZE" -> "CREATE DIRECTORY KEY" -> "ENCRYPT DATA" -> "DECRYPT DATA" -> "FINALIZE".
+2. When the **testapp** UI is displayed, click the buttons in the following sequence: "CREAT ROOT KEY" -> "INITIALIZE" -> "CREATE DIRECTORY KEY" -> "ENCRYPT DATA" -> "DECRYPT DATA" -> "FINALIZE";
 
 3. After clicking "DECRYPT DATA", the decrypted data should be the same as the initial data buffer. The output should be the same as that shown on page 51 of [Rui Yang's MSc Thesis](document/thesis-main.pdf). If this is not the case, or if there are runtime errors, please refere to **FAQ** section.
+
+#### Unit Test Case
+1. Start the **otservice** app;
+
+2. Run the test case **testapp/src/androidTest/java/fi/aalto/ssg/opentee/testapp/ApplicationTest.java**.
 
 
 ### Running other TAs
