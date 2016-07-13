@@ -45,6 +45,8 @@ The current implementation of the API uses Open-TEE in place of a hardware TEE. 
 Clone this repository:
 ```shell
 	$ git clone --recursive https://git.ssg.aalto.fi/platsec/opentee-android.git
+	$ git checkout integration
+	$ git submodule add -f https://github.com/Open-TEE/libtee.git otservice/src/main/jni/libtee
 ```
 
 
