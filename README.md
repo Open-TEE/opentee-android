@@ -89,7 +89,7 @@ For any errors during this process, please refer to the FAQ section.
 3. After clicking "DECRYPT DATA", the decrypted data should be the same as the initial data buffer. The output should be the same as that shown on page 51 of [Rui Yang's MSc Thesis](document/thesis-main.pdf). If this is not the case, or if there are runtime errors, please refere to **FAQ** section.
 
 #### Unit Test Case
-1. Start the **otservice** app;
+1. Start the **otservice** app and make sure that your device is active (no lock screen);
 
 2. Run the test case **testapp/src/androidTest/java/fi/aalto/ssg/opentee/testapp/ApplicationTest.java**.
 
