@@ -187,6 +187,9 @@ This project imports libtee as a submodule. Ensure that **otservice/src/main/jni
 #### No output after clicking "generating root key" in testapp
 Since the dependency **OPEN-TEE** can only run up to Android 5.1.1, if you deployed the **otservice** application to an Android phone/emulator which has a version higher than 5.1.1, no output will be displayed.
 
+#### failed to find build tools revision
+When you build this project using the command line, you may encounter this error. Make sure you have the right version of build tool. You can check what version you have under the **$ANDROID_HOME/build-tools**. To fix this error, you can either change the build version of the module which throws the error to the version you have in build.gradle. This way is not recommended. Alternatively, you can download the right version using the Android SDK manager.
+
 #### Other issues
 For any issues not mentioned above, please report these in the issue tracker.
 
