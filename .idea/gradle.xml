@@ -8,19 +8,19 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/javaapitest" />
             <option value="$PROJECT_DIR$/opentee" />
             <option value="$PROJECT_DIR$/otclient" />
             <option value="$PROJECT_DIR$/otservice" />
-            <option value="$PROJECT_DIR$/testapp" />
           </set>
         </option>
         <option name="myModules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/javaapitest" />
             <option value="$PROJECT_DIR$/opentee" />
             <option value="$PROJECT_DIR$/otclient" />
             <option value="$PROJECT_DIR$/otservice" />
-            <option value="$PROJECT_DIR$/testapp" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -17,7 +17,7 @@ This repository consists of the following directories:
 	* NativeLibtee
 	* Libtee
 
-- **testapp**: contains an Android test application which utilizes this Java API.
+- **javaapitest**: contains an Android test application which utilizes this Java API.
 
 ### Support Library Dependency
 1. Google ProtocolBuffers 2.6.1
@@ -54,7 +54,7 @@ Clone this repository:
 1. Import **opentee-android** into Android Studio. Go to **File->New->Import Project...** and select the **opentee-android** under the **opentee-android-test** directory. Wait for Android Studio to finish the import task.
 2. You need either an Android device or an Android emulator to run our test application. To set up a debugging environment, follow the instructions at: https://developer.android.com/studio/run/index.html
 3. Run **otservice** run-time configuration by selecting the otservice from the drop-down list on the left side of the **Run** button. Click the **Run** button and select your target device, which can be either a real Android device or an emulator.
-4. Follow the same steps as above to run the **testapp** run-time configuration.
+4. Follow the same steps as above to run the **javaapitest** run-time configuration.
 
 For any errors during this process, please refer to the **FAQ** section.
 
@@ -71,7 +71,7 @@ It is assumed that you have already installed the Android SDK and NDK (see prere
 	$ ./gradlew assembleDebug
 ```
 
-After successful compilation, the output will be two .apk files located in folder **otservice/build/outputs/apk/** and **testapp/build/outputs/apk/**. These can be installed and run on emulators or real devices as usual.
+After successful compilation, the output will be two .apk files located in folder **otservice/build/outputs/apk/** and **javaapitest/build/outputs/apk/**. These can be installed and run on emulators or real devices as usual.
 
 For any errors during this process, please refer to the FAQ section.
 
@@ -84,16 +84,16 @@ For any errors during this process, please refer to the FAQ section.
 **Note** The supported Android version is 5.0 to 5.1.1
 
 #### Manually
-1. Run the **otservice** app and then the **testapp** run-time configurations on a device or emulator;
+1. Run the **otservice** app and then the **javaapitest** run-time configurations on a device or emulator;
 
-2. When the **testapp** UI is displayed, click the buttons in the following sequence: "CREAT ROOT KEY" -> "INITIALIZE" -> "CREATE DIRECTORY KEY" -> "ENCRYPT DATA" -> "DECRYPT DATA" -> "FINALIZE";
+2. When the **javaapitest** UI is displayed, click the buttons in the following sequence: "CREAT ROOT KEY" -> "INITIALIZE" -> "CREATE DIRECTORY KEY" -> "ENCRYPT DATA" -> "DECRYPT DATA" -> "FINALIZE";
 
 3. After clicking "DECRYPT DATA", the decrypted data should be the same as the initial data buffer. The output should be the same as that shown on page 51 of [Rui Yang's MSc Thesis](document/thesis-main.pdf). If this is not the case, or if there are runtime errors, please refere to **FAQ** section.
 
 #### Unit Test Case
 1. Start the **otservice** app and make sure that your device is active (no lock screen);
 
-2. Run the test case **testapp/src/androidTest/java/fi/aalto/ssg/opentee/testapp/ApplicationTest.java**.
+2. Run the test case **javaapitest/src/androidTest/java/fi/aalto/ssg/opentee/javaapitest/ApplicationTest.java**.
 
 
 ### Running other TAs
@@ -186,7 +186,7 @@ This project imports libtee as a submodule. Ensure that **otservice/src/main/jni
 	$ git submodule update --init
 ```
 
-#### No output after clicking "generating root key" in testapp
+#### No output after clicking "generating root key" in javaapitest
 Since the dependency **OPEN-TEE** can only run up to Android 5.1.1, if you deployed the **otservice** application to an Android phone/emulator which has a version higher than 5.1.1, no output will be displayed.
 
 #### failed to find build tools revision
