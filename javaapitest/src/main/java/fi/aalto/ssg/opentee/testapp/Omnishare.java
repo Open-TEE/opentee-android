@@ -20,7 +20,7 @@ import android.util.Log;
 
 import java.util.Arrays;
 
-import fi.aalto.ssg.opentee.IContextUtils;
+import fi.aalto.ssg.opentee.OTHelper;
 import fi.aalto.ssg.opentee.ITEEClient;
 import fi.aalto.ssg.opentee.exception.CommunicationErrorException;
 import fi.aalto.ssg.opentee.imps.OpenTEE;
@@ -51,7 +51,7 @@ public class Omnishare {
         }
 
         /* push OmniShare TA to Open-TEE */
-        IContextUtils utils = (IContextUtils)ctx;
+        OTHelper utils = (OTHelper)ctx;
         try {
             if( !utils.installTA(OMNISHARE_TA) ){
                 Log.e(TAG, "Install " + OMNISHARE_TA + " failed.");

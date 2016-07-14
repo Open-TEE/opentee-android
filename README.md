@@ -123,11 +123,11 @@ This method can allow CA to install TAs to remote Open-TEE even Open-TEE is runn
 
 **Note**: If you uninstall the TEE Proxy service application, you have to install the TAs again. What's more, install TA before open a session to it.
 
-This method is introduced by the **IContextUtils** interface which accepts the TA either coming with a form of a byte array or put under the application **lib** directory. Be aware that the **IContextUtils** is an Open-TEE specific interface which is not included in the Java API that we have proposed.
+This method is introduced by the **OTHelper** interface which accepts the TA either coming with a form of a byte array or put under the application **lib** directory. Be aware that the **OTHelper** is an Open-TEE specific interface which is not included in the Java API that we have proposed.
 
-To use the utility functions that **IContextUtils** provides, the CA must have a valid **IContext** interface. Since the class which implements the **IContext** interface also implements the **IContextUtils** inteface, a valid **IContextUtils** can be retreived by just casting the **IContext** interface like the following code.
+To use the utility functions that **OTHelper** provides, the CA must have a valid **IContext** interface. Since the class which implements the **IContext** interface also implements the **OTHelper** inteface, a valid **OTHelper** can be retreived by just casting the **IContext** interface like the following code.
 ```Java
-IContextUtils utils = (IContextUtils)ctx;
+OTHelper utils = (OTHelper)ctx;
 ```
 
 ```Java
