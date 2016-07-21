@@ -37,13 +37,23 @@ I/TEE Proxy Service: installing TA:ta_1.so
 I/TEE Proxy Service: installing TA:ta_2.so
 I/TEE Proxy Service: installing TA:ta_3.so
 I/TEE Proxy Service: -----------------------------------------
+```
 
 #### Method 2 - install TA from CA
 
-**OTInstallTA** can be used for the Application to install TAs in the form of byte array streams into the _ta/_ under app home directory during runtime.
+**OTInstallTA** can be used for the Application to install TAs in the form of byte array streams during runtime. See the following example.
+
+```java
+	// create a new install TA task. The TA will be stored into $APP_DATA_PATH/opentee/ta with the name TA_NAME. Open-TEE will automatically start it once installed.
+        OTInstallTA installTA = new OTInstallTA(getApplicationContext(),    // application context
+                TA_NAME,	// the name to be stored.
+                taInBytes,	// TA in raw bytes.
+                true);		// overwrite previous TA if exists.
+
+        // the installTATask is a Runnable instance. There are many options to run it. For instance, you can just post it to a running thread like the following line of code. At the same time, make sure that your TA is not rejected by looking the logcat.
+        mHandler.post(installTA.installTATask);
+```
 
 ## License
 
 This source code is available under the terms of the Apache License, Version 2.0: <http://www.apache.org/licenses/LICENSE-2.0>
-
-

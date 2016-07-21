@@ -5,8 +5,12 @@
 .DS_Store
 /build
 /captures
+
 otservice/src/main/obj/local/
 otservice/src/main/jni/libtee
 otservice/src/main/libs
+
+bundletest/src/main/obj
+
 *~
 *.iml
