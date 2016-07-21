@@ -16,6 +16,7 @@
 package fi.aalto.ssg.opentee;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -106,6 +107,8 @@ public class OTUtils {
      */
     public static String execUnixCommand(String[] command,
                                          Map<String, String> envVars) throws InterruptedException, IOException {
+
+        /*
         ProcessBuilder processBuilder = new ProcessBuilder(command);
 
         if ( envVars != null ){
@@ -119,6 +122,20 @@ public class OTUtils {
         process.waitFor();
         String outputWithError = loadStream(process.getInputStream()) + loadStream(process.getErrorStream());
         return outputWithError;
+        */
+
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+
+        if (envVars != null) {
+            Map<String, String> env = processBuilder.environment();
+            env.clear();
+            env.putAll(envVars);
+        }
+        Process process = processBuilder.start();
+        String output = loadStream(process.getInputStream());
+        String error = loadStream(process.getErrorStream());
+        process.waitFor();
+        return output + "\n" + error;
     }
 
     /**
@@ -203,4 +220,78 @@ public class OTUtils {
         return tmpFile.getAbsolutePath();
     }
 
+    public static void installAssetToHomeDir(final Context context,
+                                      final String assetName,
+                                      final String destSubdir,
+                                      final boolean overwrite){
+        //identify the running environment and take the path of corresponding file
+        String suitableAssetPath = Build.SUPPORTED_ABIS[0] + File.separator + assetName;
+
+        Log.d(TAG_CLASS, "Copy from : " + suitableAssetPath);
+
+        try {
+            InputStream inputStream = context.getAssets().open(suitableAssetPath);
+            byte[] inputBytes = OTUtils.readBytesFromInputStream(inputStream);
+            installBytesToHomeDir(context,
+                    inputBytes,
+                    destSubdir,
+                    assetName,
+                    overwrite);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * copy the byte arrays to @destPath + outputFilePathSub
+     * @param context
+     * @param inputBytes
+     * @param outputFilePathSub
+     * @param assetName
+     * @param overwrite
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static void installBytesToHomeDir(final Context context,
+                                      final byte[] inputBytes,
+                                      final String outputFilePathSub,
+                                      final String assetName,
+                                      final boolean overwrite) {
+        try {
+            /* input check */
+            if (assetName == null || assetName.isEmpty()) return;
+
+            /* preparation */
+            //get the full path to opentee folder
+            String assetPath = OTUtils.getFullPath(context);
+
+            if (outputFilePathSub != null && !outputFilePathSub.isEmpty()) {
+                //if subdirectory name is not empty, add it to the assetPath
+                assetPath += File.separator + outputFilePathSub;
+
+                //and create parent folder if needed
+                OTUtils.checkAndCreateDir(assetPath);
+            }
+
+            //add the assertName to the assetPath to get the full path of the asset
+            assetPath += File.separator + assetName;
+
+            /* do the real job */
+            File outputFile = new File(assetPath);
+            if (!outputFile.exists() || overwrite) {
+                Log.d(TAG_CLASS, "Copy to " + assetPath);
+                FileOutputStream fos = new FileOutputStream(outputFile, false);
+                fos.write(inputBytes);
+                fos.close();
+                //change the mod of destination file to read only and with no environment variabls passed in;
+                String output =
+                        OTUtils.execUnixCommand(("/system/bin/chmod 744 " + assetPath).split(" "), null);
+                Log.d(TAG_CLASS, "chmod 744 " + assetPath);
+                Log.d(TAG_CLASS, output);
+            }
+        }
+        catch (IOException | InterruptedException e){
+            e.printStackTrace();
+        }
+    }
 }

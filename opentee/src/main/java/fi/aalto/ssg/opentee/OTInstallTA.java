@@ -27,17 +27,14 @@ public class OTInstallTA{
     public Runnable installTATask = new Runnable() {
         @Override
         public void run() {
-            Worker worker = new Worker();
-
-            worker.installBytesToHomeDir(mContext,
+            OTUtils.installBytesToHomeDir(mContext,
                     mTAinBytes,
                     OTConstants.OT_TA_DIR,
                     mTAName,
                     mOverwrite);
 
-            worker.stopExecutor();
-
-            /* update setting */
+            /*
+            // update setting/
             Setting setting = new Setting(mContext);
 
             // add new TA name to the old list if it is not existed.
@@ -67,6 +64,7 @@ public class OTInstallTA{
                     Log.i(TAG, mTAName + " already existed. So will not be added and only update its binary.");
                 }
             }
+            */
         }
     };
 }

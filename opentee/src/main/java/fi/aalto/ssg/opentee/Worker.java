@@ -30,6 +30,7 @@ import java.io.PrintWriter;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * this class is a single thread executor which can perform a list of task in a certain order
@@ -39,16 +40,11 @@ public class Worker {
     public static final String TAG_CLASS = "worker.class";
     public static final String CONF_ENCODING_STYLE = "UTF-8";
 
-    private ExecutorService mExecutor;
+    // ExecutorService mExecutor;
 
     public Worker(){
-        mExecutor = Executors.newSingleThreadExecutor();
+        //mExecutor = Executors.newSingleThreadExecutor();
         Log.d(TAG_CLASS, "executor started without context");
-    }
-
-    public Worker(Context context){
-        mExecutor = Executors.newSingleThreadExecutor();
-        Log.d(TAG_CLASS, "executor started with context");
     }
 
     /**
@@ -56,17 +52,17 @@ public class Worker {
      */
     public void stopExecutor(){
         //disable new task coming
-        if (mExecutor != null && !mExecutor.isShutdown()) mExecutor.shutdown();
+/*        if (mExecutor != null && !mExecutor.isShutdown()) mExecutor.shutdown();
 
-        /*
         try {
             if (mExecutor != null && !mExecutor.awaitTermination(100, TimeUnit.SECONDS))
                 mExecutor.shutdownNow();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        */
-        Log.d(TAG_CLASS, "executor will no longer accept new task.");
+*/
+
+        //Log.d(TAG_CLASS, "executor will no longer accept new task.");
     }
 
     /**
@@ -80,28 +76,21 @@ public class Worker {
                                       final String assetName,
                                       final String destSubdir,
                                       final boolean overwrite){
-        if ( mExecutor != null ){
-            mExecutor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    //identify the running environment and take the path of corresponding file
-                    String suitableAssetPath = Build.SUPPORTED_ABIS[0] + File.separator + assetName;
+        //identify the running environment and take the path of corresponding file
+        String suitableAssetPath = Build.SUPPORTED_ABIS[0] + File.separator + assetName;
 
-                    Log.d(TAG_CLASS, "Copy from : " + suitableAssetPath);
+        Log.d(TAG_CLASS, "Copy from : " + suitableAssetPath);
 
-                    try {
-                        InputStream inputStream = context.getAssets().open(suitableAssetPath);
-                        byte[] inputBytes = OTUtils.readBytesFromInputStream(inputStream);
-                        installBytesToHomeDir(context,
-                                inputBytes,
-                                destSubdir,
-                                assetName,
-                                overwrite);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+        try {
+            InputStream inputStream = context.getAssets().open(suitableAssetPath);
+            byte[] inputBytes = OTUtils.readBytesFromInputStream(inputStream);
+            OTUtils.installBytesToHomeDir(context,
+                    inputBytes,
+                    destSubdir,
+                    assetName,
+                    overwrite);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -116,84 +105,24 @@ public class Worker {
                                      final String srcFilePath,
                                      final String destDir,
                                      final boolean overwrite){
-        if ( mExecutor != null ){
-            mExecutor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG_CLASS, "Copy from " + srcFilePath);
 
-                    try {
-                        InputStream inputStream = new FileInputStream(srcFilePath);
-                        //take only the name of the file
-                        String fileName = srcFilePath.substring(srcFilePath.lastIndexOf(File.pathSeparatorChar));
-                        byte[] fileContentBytes = OTUtils.readBytesFromInputStream(inputStream);
-                        //store the file into the destination directory
-                        installBytesToHomeDir(context,
-                                fileContentBytes,
-                                destDir,
-                                fileName,
-                                overwrite);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        }
-    }
+        Log.d(TAG_CLASS, "Copy from " + srcFilePath);
 
-    /**
-     * copy the byte arrays to @destPath + outputFilePathSub
-     * @param context
-     * @param inputBytes
-     * @param outputFilePathSub
-     * @param assetName
-     * @param overwrite
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    public void installBytesToHomeDir(final Context context,
-                                      final byte[] inputBytes,
-                                      final String outputFilePathSub,
-                                      final String assetName,
-                                      final boolean overwrite) {
         try {
-            /* input check */
-            if (assetName == null || assetName.isEmpty()) return;
-
-            /* preparation */
-            //get the full path to opentee folder
-            String assetPath = OTUtils.getFullPath(context);
-
-            if (outputFilePathSub != null && !outputFilePathSub.isEmpty()) {
-                //if subdirectory name is not empty, add it to the assetPath
-                assetPath += File.separator + outputFilePathSub;
-
-                //and create parent folder if needed
-                OTUtils.checkAndCreateDir(assetPath);
-            }
-
-            //add the assertName to the assetPath to get the full path of the asset
-            assetPath += File.separator + assetName;
-
-            /* do the real job */
-            File outputFile = new File(assetPath);
-            if (!outputFile.exists() || overwrite) {
-                Log.d(TAG_CLASS, "Copy to " + assetPath);
-                FileOutputStream fos = new FileOutputStream(outputFile, false);
-                fos.write(inputBytes);
-                fos.close();
-                //change the mod of destination file to read only and with no environment variabls passed in;
-                String output =
-                        OTUtils.execUnixCommand(("/system/bin/chmod 744 " + assetPath).split(" "), null);
-                Log.d(TAG_CLASS, "chmod 744 " + assetPath);
-                Log.d(TAG_CLASS, output);
-            }
-        }
-        catch (IOException | InterruptedException e){
+            InputStream inputStream = new FileInputStream(srcFilePath);
+            //take only the name of the file
+            String fileName = srcFilePath.substring(srcFilePath.lastIndexOf(File.pathSeparatorChar));
+            byte[] fileContentBytes = OTUtils.readBytesFromInputStream(inputStream);
+            //store the file into the destination directory
+            OTUtils.installBytesToHomeDir(context,
+                    fileContentBytes,
+                    destDir,
+                    fileName,
+                    overwrite);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 
     /**
      * execute a binary file in home folder
@@ -204,12 +133,16 @@ public class Worker {
     public void execBinaryInHomeDir(final Context context,
                                     final String binaryFileName,
                                     final Map<String, String> envVars){
+
         try {
             //construct the command. With "&" at the end to run the command as background process;
             String commandString =
                     OTUtils.getFullPath(context) + File.separator + OTConstants.OT_BIN_DIR + File.separator + binaryFileName + " &";
+
+            Log.d(TAG_CLASS, "Run binary " + commandString);
+
             String outputString = OTUtils.execUnixCommand(commandString.split(" "), envVars);
-            Log.d(TAG_CLASS, "Run binary " + binaryFileName);
+
             Log.d(TAG_CLASS, "Output: " + outputString);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -259,86 +192,64 @@ public class Worker {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-/*
-        if ( mExecutor != null ){
-            mExecutor.submit(new Runnable() {
-                @Override
-                public void run() {
-
-                }
-            });
-        }
-*/
     }
 
     public void startOpenTEEEngine(final Context context) throws IOException, InterruptedException {
-        if ( mExecutor != null ){
-            mExecutor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        String appHomePath = OTUtils.getFullPath(context);
+        try {
+            String appHomePath = OTUtils.getFullPath(context);
 
-                        String command = OTConstants.OPENTEE_ENGINE_ASSET_BIN_NAME
-                                + " -c " + appHomePath + File.separator + OTConstants.OPENTEE_CONF_NAME
-                                + " -p " + appHomePath;
+            String command = OTConstants.OPENTEE_ENGINE_ASSET_BIN_NAME
+                    + " -c " + appHomePath + File.separator + OTConstants.OPENTEE_CONF_NAME
+                    + " -p " + appHomePath;
 
-                        //Log.d(TAG_CLASS, "Starting opentee engine with command " + command);
-                        Map<String, String> envVars = OTUtils.getOTEnvVars(context);
-                        execBinaryInHomeDir(context, command, envVars);
+            //Log.d(TAG_CLASS, "Starting opentee engine with command " + command);
+            Map<String, String> envVars = OTUtils.getOTEnvVars(context);
 
-                    } catch (IOException | InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            Log.i(TAG_CLASS, envVars.toString());
+
+            execBinaryInHomeDir(context, command, envVars);
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
     public void stopOpenTEEEngine(final Context context){
-        if ( mExecutor != null ){
-            mExecutor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        String appHomePath = OTUtils.getFullPath(context);
-                        String pid = OTUtils.readFileToString(
-                                appHomePath
-                                        + File.separator
-                                        + OTConstants.OPENTEE_PID_FILENAME
-                        );
+        try {
+            String appHomePath = OTUtils.getFullPath(context);
+            String pid = OTUtils.readFileToString(
+                    appHomePath
+                            + File.separator
+                            + OTConstants.OPENTEE_PID_FILENAME
+            );
 
-                        /**
-                         * kill the process
-                         */
-                        if ( pid != null ){
-                            pid = pid.trim();
-                            if ( !pid.isEmpty() ){
-                                android.os.Process.killProcess(Integer.parseInt(pid));
-                                Log.d(TAG_CLASS, "PID " + pid + " found. Killing rigth now ");
-                            }
-                        }
-
-                        /**
-                         * Delete the socket file
-                         */
-                        String command = "/system/bin/rm " + appHomePath + File.separator + OTConstants.OPENTEE_SOCKET_FILENAME;
-                        OTUtils.execUnixCommand(command.split(" "), null);
-
-                        /**
-                         * Delete the pid file
-                         */
-                        command = "/system/bin/rm " + appHomePath + File.separator + OTConstants.OPENTEE_PID_FILENAME;
-                        OTUtils.execUnixCommand(command.split(" "), null);
-
-                        Log.d(TAG_CLASS, "open-tee engine stopped");
-                    } catch (IOException | InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            /**
+             * kill the process
+             */
+            if ( pid != null ){
+                pid = pid.trim();
+                if ( !pid.isEmpty() ){
+                    android.os.Process.killProcess(Integer.parseInt(pid));
+                    Log.d(TAG_CLASS, "PID " + pid + " found. Killing rigth now ");
                 }
-            });
-        }
+            }
 
+            /**
+             * Delete the socket file
+             */
+            String command = "/system/bin/rm " + appHomePath + File.separator + OTConstants.OPENTEE_SOCKET_FILENAME;
+            OTUtils.execUnixCommand(command.split(" "), null);
+
+            /**
+             * Delete the pid file
+             */
+            command = "/system/bin/rm " + appHomePath + File.separator + OTConstants.OPENTEE_PID_FILENAME;
+            OTUtils.execUnixCommand(command.split(" "), null);
+
+            Log.d(TAG_CLASS, "open-tee engine stopped");
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

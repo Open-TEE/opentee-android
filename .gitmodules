@@ -1,3 +1,6 @@
 [submodule "otservice/src/main/jni/libtee"]
 	path = otservice/src/main/jni/libtee
 	url = https://github.com/Open-TEE/libtee.git
+[submodule "bundletest/src/main/jni/libtee"]
+	path = bundletest/src/main/jni/libtee
+	url = https://github.com/Open-TEE/libtee.git

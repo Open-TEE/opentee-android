@@ -8,7 +8,7 @@ This repository consists of the following directories:
 
 - **document**: contains the design documents for this project, including the Java API documentation and [Rui Yang's MSc Thesis](document/thesis-main.pdf).
 
-- **opentee**: has [Open-TEE](https://open-tee.github.io) along with utility functions to use Open-TEE in Android.
+- **opentee**: is an Android Library which has [Open-TEE](https://open-tee.github.io) along with utility functions to use Open-TEE in Android. You can import either the source code of this module or using its aar file (see instruction [here](http://stackoverflow.com/questions/16682847/how-to-manually-include-external-aar-package-using-new-gradle-android-build-syst)) after you build its source code.
 
 - **otclient**: contains the Java API (OT-J) and an implementation of this API using Open-TEE. Android Client Applications (CAs) must import this module in order to interact with the **otservice** module.
 
@@ -18,6 +18,8 @@ This repository consists of the following directories:
 	* Libtee
 
 - **javaapitest**: contains an Android test application which utilizes this Java API.
+
+- **bundletest**: is a standalone Android application which includes Open-TEE by importing the **opentee** module.
 
 ### Support Library Dependency
 1. Google ProtocolBuffers 2.6.1
@@ -94,72 +96,6 @@ For any errors during this process, please refer to the FAQ section.
 1. Start the **otservice** app and make sure that your device is active (no lock screen);
 
 2. Run the test case **javaapitest/src/androidTest/java/fi/aalto/ssg/opentee/javaapitest/ApplicationTest.java**.
-
-
-### Running other TAs
-#### Method 1 - install TA along with Open-TEE
-The following steps describe how to install TAs during the installation of the Open-TEE.
-
-1. Copy the new TAs into **opentee/src/main/assets/$abi_version**.
-
-2. Change the value of TA_List in **opentee/src/main/assets/config.properties** to include the names of the new TAs. Mutiple names must be separated using "," as in the following example:
-
-```shell
-TA_List=ta_1.so,ta_2.so,ta_3.so
-```
-
-Once installed, the new TAs will be started by Open-TEE automatically. You can review the **opentee** log (using standard [Android logging](https://developer.android.com/studio/debug/index.html#systemLog)) to ensure that your TAs are installed. In the log message, you will see something similar to the following text:
-```c
-I/TEE Proxy Service: -------- begin installing TAs -----------
-I/TEE Proxy Service: installing TA:ta_1.so
-I/TEE Proxy Service: installing TA:ta_2.so
-I/TEE Proxy Service: installing TA:ta_3.so
-I/TEE Proxy Service: -----------------------------------------
-```
-
-
-#### Method 2 - install TA from CA
-This method can allow CA to install TAs to remote Open-TEE even Open-TEE is running.
-
-**Note**: If you uninstall the TEE Proxy service application, you have to install the TAs again. What's more, install TA before open a session to it.
-
-This method is introduced by the **OTHelper** interface which accepts the TA either coming with a form of a byte array or put under the application **lib** directory. Be aware that the **OTHelper** is an Open-TEE specific interface which is not included in the Java API that we have proposed.
-
-To use the utility functions that **OTHelper** provides, the CA must have a valid **IContext** interface. Since the class which implements the **IContext** interface also implements the **OTHelper** inteface, a valid **OTHelper** can be retreived by just casting the **IContext** interface like the following code.
-```Java
-OTHelper utils = (OTHelper)ctx;
-```
-
-```Java
-try {
-    // install TA under application lib directory by simply using its name.
-    if( !utils.installTA("ta_name.so") ){
-        Log.e(TAG, "Install " + OMNISHARE_TA + " failed.");
-    }
-
-    // install TA in the form of byte array.
-    utils.installTA("ta_name.so", ta_in_bytes);
-
-} catch (CommunicationErrorException e) {
-    // handle exception here.
-}
-```
-
-
-Make sure that your TA is not rejected by the Open-TEE which can be easily spoted in the log message from the Open-TEE. If error happened, you can see similar error msg as follows:
-```shell
-E/tee_manager: Open-TEE/emulator/manager/ta_dir_watch.c:add_new_ta:227  TA "incorrectTAExample.so" rejected
-```
-The rejected TA will not be started by Open-TEE. You can take the correct example TA from <https://github.com/Open-TEE/TAs>.
-
-
-## Update Open-TEE
-
-Follow the instructions on the [Open-TEE github page](https://open-tee.github.io/android/) to build Open-TEE engine for a specific platform. Then copy the generated Open-TEE engine and shared libraries into the assets directory of the opentee module using following commands:
-```shell
-	$ cp $ANDROID_ROOT/out/target/product/$abiVersion/system/bin/opentee-engine $OPENTEE_Android/opentee/src/main/assets/$ABI/
-	$ cp $ANDROID_ROOT/out/target/product/$abiVersion/system/lib/*.so $OPENTEE_Android/opentee/src/main/assets/$ABI/
-```
  
 ## Generate API Javadoc
 
@@ -177,7 +113,6 @@ Generate the java doc using the following command:
 	$ javadoc -doclet com.tarsec.javadoc.pdfdoclet.PDFDoclet -docletpath $PDFDOCLET_UNZIPPED_DIR/pdfdoclet-1.0.3-all.jar -pdf $OUTPUT_FILE_WITH_FULL_PATH $PROJECT_HOME_DIR/opentee-android/otclient/src/main/java/fi/aalto/ssg/opentee/*.* $PROJECT_HOME_DIR/opentee-android/otclient/src/main/java/fi/aalto/ssg/opentee/exception/*.*
 ```
 
-
 ## FAQ
 
 #### Missing files under libtee
@@ -189,8 +124,11 @@ This project imports libtee as a submodule. Ensure that **otservice/src/main/jni
 #### No output after clicking "generating root key" in javaapitest
 Since the dependency **OPEN-TEE** can only run up to Android 5.1.1, if you deployed the **otservice** application to an Android phone/emulator which has a version higher than 5.1.1, no output will be displayed.
 
-#### failed to find build tools revision
+#### Failed to find build tools revision
 When you build this project using the command line, you may encounter this error. Make sure you have the right version of build tool. You can check what version you have under the **$ANDROID_HOME/build-tools**. To fix this error, you can either change the build version of the module which throws the error to the version you have in build.gradle. This way is not recommended. Alternatively, you can download the right version using the Android SDK manager.
+
+#### Missing _libtee.so_
+You can either use prebuilt libtee.so from the _opentee/src/main/jniLibs/$abiversion/libtee.so_ or build the libtee.so from the libtee source code using _ndk-build_ (make sure that you have ndk-build downloaded and added its path to the PATH environment variable).
 
 #### Other issues
 For any issues not mentioned above, please report these in the issue tracker.

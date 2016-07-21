@@ -1,1 +1,1 @@
-include ':otservice', ':otclient', ':javaapitest', ':opentee'
+include ':otservice', ':otclient', ':javaapitest', ':opentee', ':bundletest'
