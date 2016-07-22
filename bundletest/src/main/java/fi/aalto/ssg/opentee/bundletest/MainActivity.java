@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // create a new install TA task. The TA will be stored into $APP_DATA_PATH/opentee/ta with the name STORAGE_TA_NAME. Open-TEE will automatically start the TA.
+        // create a new install TA task. The TA will be stored into $APP_DATA_PATH/opentee/ta with the name CONN_TA_NAME. Open-TEE will automatically start the TA.
         OTInstallTA installConnTA = new OTInstallTA(getApplicationContext(),    // application context
                 CONN_TA_NAME,   // the name to be stored.
                 connTaInBytes,  // TA in raw bytes.

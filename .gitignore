@@ -5,6 +5,7 @@
 .DS_Store
 /build
 /captures
+.idea/misc.xml
 
 otservice/src/main/obj/local/
 otservice/src/main/jni/libtee
