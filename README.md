@@ -92,7 +92,7 @@ Just run the **bundletest** runtime configuration. Its output can be seen in the
  
 ```shell
 SUCCESS !!!Connection test app did not found any errors.^^^ SUCCESS ^^^
-```shell
+```
 
 
 ### Running the Java API Test App
