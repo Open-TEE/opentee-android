@@ -6,9 +6,9 @@
 /build
 /captures
 .idea/misc.xml
+.idea/vcs.xml
 
 otservice/src/main/obj/local/
-otservice/src/main/jni/libtee
 otservice/src/main/libs
 
 bundletest/src/main/obj
