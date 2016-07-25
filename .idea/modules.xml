@@ -5,12 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/bundletest/bundletest.iml" filepath="$PROJECT_DIR$/bundletest/bundletest.iml" />
       <module fileurl="file://$PROJECT_DIR$/javaapitest/javaapitest.iml" filepath="$PROJECT_DIR$/javaapitest/javaapitest.iml" />
       <module fileurl="file://$PROJECT_DIR$/opentee/opentee.iml" filepath="$PROJECT_DIR$/opentee/opentee.iml" />
-      <module fileurl="file://$PROJECT_DIR$/teeservice/opentee.iml" filepath="$PROJECT_DIR$/teeservice/opentee.iml" />
       <module fileurl="file://$PROJECT_DIR$/opentee-android.iml" filepath="$PROJECT_DIR$/opentee-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/otclient/otclient.iml" filepath="$PROJECT_DIR$/otclient/otclient.iml" />
       <module fileurl="file://$PROJECT_DIR$/otservice/otservice.iml" filepath="$PROJECT_DIR$/otservice/otservice.iml" />
-      <module fileurl="file://$PROJECT_DIR$/otservice/teeservice.iml" filepath="$PROJECT_DIR$/otservice/teeservice.iml" />
-      <module fileurl="file://$PROJECT_DIR$/javaapitest/testapp.iml" filepath="$PROJECT_DIR$/javaapitest/testapp.iml" />
     </modules>
   </component>
 </project>
