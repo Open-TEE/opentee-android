@@ -2,11 +2,13 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
+    //noinspection GradleDependency
     buildToolsVersion "23.0.2"
 
     defaultConfig {
         applicationId "fi.aalto.ssg.opentee.openteeandroid"
         minSdkVersion 21
+        //noinspection OldTargetApi
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -102,6 +104,8 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
+
+    //noinspection GradleDynamicVersion
     compile 'com.android.support:appcompat-v7:+'
     compile 'com.google.protobuf:protobuf-java:2.6.1'
     compile project(':otclient')

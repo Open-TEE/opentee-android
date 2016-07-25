@@ -20,6 +20,7 @@ import java.util.UUID;
 /**
  * wrapper class for libtee
  */
+@SuppressWarnings({"ALL", "JniMissingFunction"})
 public class NativeLibtee {
 
     static {
