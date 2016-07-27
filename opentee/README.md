@@ -8,13 +8,7 @@ The module can be bundled along with any Android app that wants to utilize Open-
 
 ### Update Open-TEE
 
-Follow the instructions on the [Open-TEE github page](https://open-tee.github.io/android/) to build Open-TEE engine for a specific platform. Then copy the generated Open-TEE engine and shared libraries into the assets directory of the opentee module using following commands:
-```shell
-	$ cp $ANDROID_ROOT/out/target/product/$abiVersion/system/bin/opentee-engine $OPENTEE_Android/opentee/src/main/assets/$ABI/
-	$ cp $ANDROID_ROOT/out/target/product/$abiVersion/system/lib/*.so $OPENTEE_Android/opentee/src/main/jniLibs/$ABI/
-	$ mv $OPENTEE_Android/opentee/src/main/jniLibs/$ABI/libLauncher.so $OPENTEE_Android/opentee/src/main/assets/$ABI/
-	$ mv $OPENTEE_Android/opentee/src/main/jniLibs/$ABI/libManager.so $OPENTEE_Android/opentee/src/main/assets/$ABI/
-```
+Follow the instructions on the [Open-TEE github page](https://open-tee.github.io/android/) to build Open-TEE engine for a specific platform. Then copy the generated Open-TEE engine and shared libraries into the assets directory of the opentee module using the **install_opentee.sh** script. Make sure that you change the _ABIS_ in this script to the current ABI that you are building.
 
 ### Running other TAs
 
