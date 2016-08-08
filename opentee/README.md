@@ -1,38 +1,53 @@
-#Opentee-android
+## Opentee-android
 
-This is an android library that packages the Open-TEE compiled files (binaries/libraries) and installs/runs them in a device with application privileges (not root). The necessary files are bundled as assets in the Application. All binaries and libraries loaded by the native code are in src/main/assets/{armeabi,armeabi-v7a,x86} (and are used because the LD_LIBRARY_PATH environment variables is explicitly specified) while all libraries that are dynamically loaded by the native code (and not as a dependency) are in src/main/libs/{armeabi,armeabi-v7a,x86}.
+This is an android library that packages the Open-TEE compiled files (binaries/libraries) and provides utility functions to install/run them in a device with application privileges (not root). The necessary binary files(including libLauncher.so and libManager.so) along with its setting file _opentee.conf.android_ are bundled as assets in the Application. And required library files are included under the **jniLibs** folder, which will be bundled with the APK and pushed to the **lib** directory during installation of the application. The path of these libraries is stored in the LD_LIBRARY_PATH environment variables which must be specified in the setting file so that those binary files can find and load them correctly. In addition, all binaries and libraries loaded by the native code have different target version {armeabi,armeabi-v7a,x86}.
 
-An Android service is exposed and provides an easy interface (via the _OpenTEEConnection_ class) for developers to install or run Open-TEE. The service listens for messages from clients that bind to it and executes whatever task it is given sequentially. Single-threading in the Android Service is used to avoid race conditions where a binary might be executed before it is installed in the home directory or before the engine is restarted etc.
+All the files excluding those library files are installed in the home data directory of the app. In android that corresponds to _/data/data/<application package name>/opentee/_. Inside that directory three sub-directories are created: _bin/_ for the binaries _opentee-engine_, _ta/_ for trusted applications and _tee/_ for libraries loaded by the native code dynamically  (libManagerApi and libLauncherApi). That directory also keeps the process id file (.pid) of the Open-TEE engine and the socket file that is used for communication between the manager and the client applications. Since all these files are contained inside the Android applications directory and are executed by the applications' user no other permissions are necessary to run Open-TEE.
 
-All the files are installed in the home data directory of the app. In android that corresponds to _/data/data/<application package name>/opentee/_. Inside that directory three sub-directories are created: _bin/_ for the binaries, _ta/_ for trusted applications and _tee/_ for libraries loaded by the native code dynamically  (libManagerApi and libLauncherApi). That directory also keeps the process id file (.pid) of the Open-TEE engine and the socket file that is used for communication between the manager and the client applications. Since all these files are contained inside the Android applications directory and are executed by the applications' user no other permissions are necessary to run Open-TEE.
+The module can be bundled along with any Android app that wants to utilize Open-TEE. An example about how to deploy Open-TEE using this module can be found in another module named **bundletest**.
 
-All libraries that are dependencies to Open-TEE and are not loaded dynamically are kept in the src/main/libs folder of the module. This is used as the directory where the system linker will search for dependency libraries and is defined by the environmental variable LD_LIBRARY_PATH.
+### Update Open-TEE
 
-The module can be bundled along with any Android app that wants to utilize Open-TEE. That app will then bind to the provided Android service and install/run Open-TEE to test any TA on it. Additional functions are also provided for the Application using the service to install TAs in the home directory via byte array streams.
+Follow the instructions on the [Open-TEE github page](https://open-tee.github.io/android/) to build Open-TEE engine for a specific platform. Then copy the generated Open-TEE engine and shared libraries into the assets directory of the opentee module using the **install_opentee.sh** script. Make sure that you change the _ABIS_ in this script to the current ABI that you are building.
 
-### Including/updating Open-TEE compiled binaries and libraries
+### Running other TAs
 
-You can use the `install_opentee_files.sh` script to install the binaries and libraries to the appropriate directories
-easily. The script takes as input the $OUT (output directory) that exists after compiling Open-TEE against the android
-source tree. The subdirectories in $OUT should be _system/_, _obj/_, _symbols/_ .
+#### Method 1 - install TA along with Open-TEE
 
-### Importing and testing a TA via Android studio
+The following steps describe how to install TAs during the installation of the Open-TEE.
 
-There are two ways of importing TAs to the Open-TEE android module:
+1. Copy the new TAs into **opentee/src/main/assets/$abi_version/** folder;
 
-1. By running *./install_opentee_files.sh*  which will copy your compiled CA and TA to the appropriate directories in the Studio project. 
-2. Modify OTConstants.java to add the names of your CA/TA
-3. Modify the MSG_INSTALL_ALL function in *OpenTEEService.java* to also install your TA to *OTConstants.OPENTEE_TA_DIR* and your CA to *OTConstants.OPENTEE_BIN_DIR*
+2. Change the value of TA_List in **opentee/src/main/assets/config.properties** to include the names of the new TAs. Mutiple names must be separated using "," as in the following example:
 
-OR
+```shell
+TA_List=ta_1.so,ta_2.so,ta_3.so
+```
 
-1. Use only the OpenTEEConnection class and its installByteStreamTA() method to install your TA from any source (file, network etc). An example can be seen in MainActivity.java in the opentee-android module (testapp) demonstrating the usage of the service.
+Once installed, the new TAs will be started by Open-TEE automatically. You can review the **opentee** log (using standard [Android logging](https://developer.android.com/studio/debug/index.html#systemLog)) to ensure that your TAs are installed. In the log message, you will see something similar to the following text:
+```c
+I/TEE Proxy Service: -------- begin installing TAs -----------
+I/TEE Proxy Service: installing TA:ta_1.so
+I/TEE Proxy Service: installing TA:ta_2.so
+I/TEE Proxy Service: installing TA:ta_3.so
+I/TEE Proxy Service: -----------------------------------------
+```
 
-In both cases run your CA via an OpenTEEConnection instance. E.g: `mOpenTEEConnection.runOTBinary(OTConstants.STORAGE_TEST_APP_ASSET_BIN_NAME)`
+#### Method 2 - install TA from CA
 
+**OTInstallTA** can be used for the Application to install TAs in the form of byte array streams during runtime. See the following example.
 
-##License
+```java
+// create a new install TA task. The TA will be stored into $APP_DATA_PATH/opentee/ta with the name TA_NAME. Open-TEE will automatically start it once installed.
+OTInstallTA installTA = new OTInstallTA(getApplicationContext(),    // application context
+                TA_NAME,	// the name to be stored.
+                taInBytes,	// TA in raw bytes.
+                true);		// overwrite previous TA if exists.
 
-This source code is available under the terms of the Apache License, Version 2.0:
-http://www.apache.org/licenses/LICENSE-2.0
+// the installTATask is a Runnable instance. There are many options to run it. For instance, you can just post it to a running thread like the following line of code. At the same time, make sure that your TA is not rejected by looking the logcat.
+mHandler.post(installTA.installTATask);
+```
 
+## License
+
+This source code is available under the terms of the Apache License, Version 2.0: <http://www.apache.org/licenses/LICENSE-2.0>

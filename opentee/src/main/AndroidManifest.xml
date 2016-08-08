@@ -1,14 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="fi.aalto.ssg.opentee" >
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="fi.aalto.ssg.opentee">
 
     <application
-        android:allowBackup="true"
-        android:label="@string/app_name" >
-        <service
-            android:name="fi.aalto.ssg.opentee.OpenTEEService"
-            android:exported="false" >
-        </service>
+        android:allowBackup="false"
+        android:label="@string/app_name"
+        android:supportsRtl="true">
 
     </application>
 

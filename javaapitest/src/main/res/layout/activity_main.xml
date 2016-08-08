@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="fi.aalto.ssg.opentee.testapp.MainActivity">
+
+    <LinearLayout
+        android:layout_weight="0.7"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:orientation="horizontal"
+        android:id="@+id/top"
+        style="?android:attr/buttonBarButtonStyle" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/left">
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Create Root Key"
+                android:id="@+id/button_create_root_key"
+                android:onClick="doCreateRootKey"
+                tools:ignore="HardcodedText" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Initialize"
+                android:enabled="false"
+                android:id="@+id/button_initialize"
+                android:onClick="doInitialize" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Finalize"
+                android:enabled="false"
+                android:id="@+id/button_finalize"
+                android:onClick="doFinalize"/>
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
+
+        <LinearLayout
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/right">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Create Directory Key"
+                android:enabled="false"
+                android:id="@+id/button_create_directory_key"
+                android:onClick="doCreateDirectoryKey" />
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Encrypt Data"
+                android:enabled="false"
+                android:id="@+id/button_encrypt_file"
+                android:onClick="doEncryptFile" />
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Decrypt Data"
+                android:enabled="false"
+                android:id="@+id/button_decrypt_file"
+                android:onClick="doDecryptFile" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_weight="0.36"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:orientation="horizontal"
+        android:id="@+id/bottom" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/view_log" />
+    </LinearLayout>
+</LinearLayout>

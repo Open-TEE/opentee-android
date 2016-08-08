@@ -5,12 +5,24 @@
       <GradleProjectSettings>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="1.7" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/bundletest" />
+            <option value="$PROJECT_DIR$/javaapitest" />
             <option value="$PROJECT_DIR$/opentee" />
-            <option value="$PROJECT_DIR$/testapp" />
+            <option value="$PROJECT_DIR$/otclient" />
+            <option value="$PROJECT_DIR$/otservice" />
+          </set>
+        </option>
+        <option name="myModules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/bundletest" />
+            <option value="$PROJECT_DIR$/javaapitest" />
+            <option value="$PROJECT_DIR$/opentee" />
+            <option value="$PROJECT_DIR$/otclient" />
+            <option value="$PROJECT_DIR$/otservice" />
           </set>
         </option>
       </GradleProjectSettings>
